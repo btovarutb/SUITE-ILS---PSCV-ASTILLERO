@@ -1,0 +1,76 @@
+{% extends './base.html' %}
+
+{% block title %}Cotecmar || Equipo - RCM{% endblock %}
+
+{% block custom %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mostrar_RCM.css') }}">
+{% endblock %}
+
+
+
+{% block nombre %}LSA | RCM{% endblock %}
+
+{% block body %}
+<h2 class="section-title text-center"> Reliability Centered Maintenance (RCM)</h2>
+  <div class="scroll-container-horizontal">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" >#</th>
+          <th scope="col" >Sistema</th>
+          <th scope="col" >Falla Funcional</th>
+          <th scope="col" >Item o componente</th>
+          <th scope="col" >Codigo Modo de Falla</th>
+          <th scope="col" >Consecutivo de Modo de Falla</th>
+          <th scope="col" >Descripción Modo de Falla</th>
+          <th scope="col" >Causas</th>
+          <th scope="col" >Hidden Failures</th>
+          <th scope="col" >Safety</th>
+          <th scope="col" >Environment</th>
+          <th scope="col" >Operation</th>
+          <th scope="col" >H1/S1/N1/O1</th>
+          <th scope="col" >H2/S2/N2/O2</th>
+          <th scope="col" >H3/S3/N3/O3</th>
+          <th scope="col" >H4/S4/</th>
+          <th scope="col" >H5</th>
+          <th scope="col" >Tarea</th>
+          <th scope="col">Accion Recomendada</th>
+          <th scope="col" >Intervalo Inicial</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        {% for rcm in rcms %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ rcm['sistema'] }}</td>
+          <td>{{ rcm['falla_funcional'] }}</td>
+          <td>{{ rcm['componente'] }}</td>
+          <td>{{ rcm['codigo_modo_falla'] }}</td>
+          <td>{{ rcm['consecutivo_modo_falla'] }}</td>
+          <td>{{ rcm['descripcion_modo_falla'] }}</td>
+          <td>{{ rcm['causa'] }}</td>
+          <td>{{ rcm['hidden_failures'] }}</td>
+          <td>{{ rcm['safety'] }}</td>
+          <td>{{ rcm['environment'] }}</td>
+          <td>{{ rcm['operation'] }}</td>
+          <td>{{ rcm['h1_s1_n1_o1'] }}</td>
+          <td>{{ rcm['h2_s2_n2_o2'] }}</td>
+          <td>{{ rcm['h3_s3_n3_o'] }}</td>
+          <td>{{ rcm['h4_s4'] }}</td>
+          <td>{{ rcm['h5'] }}</td>
+          <td>{{ rcm['tarea'] }}</td>
+          <td>{{ rcm['id_accion_recomendada'] }}</td>
+          <td>{{ rcm['intervalo_inicial_horas'] }}</td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+<div class="mt-4">
+  <button type="button" class="btn btn-primary"><a href="{{url_for('editar_RCM_lista')}}">Editar RCM</a></button>
+</div>  
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base_navbar.html' %}
+
+{% block title %}Cotecmar || Editar Repuesto{% endblock %}
+
+{% block custom %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/repuesto.css') }}">
+{% endblock %}
+
+{% block nombre %}LSA | Editar Repuesto{% endblock %}
+
+{% block content %}
+
+<div class="col">
+    <div id="hoja">
+        <h3 class="section-title text-center">Editar Repuesto</h3>
+        <h4 style="color: #013882; text-align: center; "> Para {{ nombre_equipo }} </h4>
+            <form id="editar-repuesto-form" data-repuesto-id="{{ repuesto.id }}" enctype="multipart/form-data">
+                <input type="hidden" id="id_equipo_info" name="id_equipo_info" value="{{ id_equipo_info }}">
+                <div class="row">
+                    <div class="col-md-12">
+                        
+                        <label for="nombre_repuesto" class="form-label mt-3">Nombre del Repuesto</label>
+                        <input type="text" class="form-control" id="nombre_repuesto" name="nombre_repuesto" value="{{ repuesto.nombre_repuesto }}">
+
+                        <div class="mt-3">
+                            <label for="valor" class="form-label">Valor</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="valor" name="valor" value="{{ repuesto.valor }}">
+                                <select class="form-select" id="moneda" name="moneda" style="width: auto;">
+                                    <option value="USD">USD</option>
+                                    <option value="EURO">EURO</option>
+                                    <option value="COP">COP</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <label for="mtbf" class="form-label mt-3">MTBF</label>
+                        <input type="text" class="form-control" id="mtbf" name="mtbf" value="{{ repuesto.mtbf }}">
+
+                        <label for="codigo_otan" class="form-label mt-3">Código OTAN</label>
+                        <input type="text" class="form-control" id="codigo_otan" name="codigo_otan" value="{{ repuesto.codigo_otan }}">
+
+                        <label for="dibujo_transversal" class="form-label mt-3">Dibujo de Sección Transversal</label>
+                        <input type="file" class="form-control" id="dibujo_transversal" name="dibujo_transversal" accept="image/*">
+
+                        {% if repuesto.dibujo_transversal %}
+                            <p>Imagen actual:</p>
+                            <img src="data:image/png;base64,{{ repuesto.dibujo_transversal|b64encode }}" alt="Dibujo actual" style="max-width: 200px; max-height: 200px;">
+                        {% endif %}
+
+                        <label for="notas" class="form-label mt-3">Notas</label>
+                        <textarea class="form-control" id="notas" name="notas">{{ repuesto.notas }}</textarea>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4">
+                    <input type="hidden" id="id_equipo_info" name="id_equipo_info" value="{{ id_equipo_info}}">
+                    <button type="submit" class="btn btn-primary" id="btn-guardar-repuesto">Guardar cambios</button>
+                </div>
+            </form>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/editar_repuesto.js') }}"></script>
+
+{% endblock %}

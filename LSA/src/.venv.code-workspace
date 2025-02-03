@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": ".venv",
+			"path": "../../../../../xampp/.venv"
+		},
+		{
+			"name": "LSA",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}

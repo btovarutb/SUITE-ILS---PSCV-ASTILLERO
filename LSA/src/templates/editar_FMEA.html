@@ -1,0 +1,148 @@
+{% extends './base.html' %}
+
+{% block title %}Cotecmar || Equipo - FMEA{% endblock %}
+
+{% block custom %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/FMEA.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scroll.css') }}">
+{% endblock %}
+
+
+
+{% block nombre %}LSA | FMEA{% endblock %}
+
+{% block body %}
+<div class="container" id="reporte">
+  <div class="row toolBar" style="position: sticky; top: 65px;">
+    <div class="col-7 m-0 pt-3" style="align-content: center;">
+        <h3 class="titulo">Failure Modes and Effects Analysis (FMEA)</h3>
+        <h5 style="color: #013882; padding-left: 10px; "> Para {{ nombre_equipo }} </h5>
+    </div>
+    <div class="col-5 pt-3" style="align-items: start; justify-content: end; display: flex; padding-right: 1.5rem;">
+        <div class="buttons" style="display: flex; gap: 10px;">
+            <a href="{{ url_for('registro_FMEA',id_equipo_info=id_equipo_info) }}" 
+               class="btn btn-primary">Agregar modo de falla</a>
+               <a href="{{ url_for('editar_RCM_lista', id_equipo_info=id_equipo_info) }}" 
+               class="btn btn-primary">Ver RCM</a>
+            <a href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" 
+               class="btn btn-secondary">Cerrar modulo</a>
+        </div>                
+    </div>
+  </div>
+  <div id="fade-container" style="top: 142px;"></div>
+  <div class="pt-0">
+    <div class="col ">
+      <button class="scroll-button left hidden scroll-left">◀</button>
+      <div class="scroll-container-horizontal">
+        <table class="table table-bordered">
+          <thead>
+            <tr >
+              <th>#</th>
+              <th>Sistema</th>
+              <th>Falla Funcional</th>
+              <th>Componente</th>
+              <th>Código de Modo de Falla</th>
+              <th>Consecutivo Modo de Falla</th>
+              <th>Descripción Modo de Falla</th>
+              <th>Causa</th>
+              <th>Mecanismo de Falla</th>
+              <th>Detalle del Mecanismo</th>
+              <th>MTBF</th>
+              <th>MTTR</th>
+              <th>FO - Fallo Oculto (Valor)</th>
+              <th>FO - Fallo Oculto (Descripción)</th>
+              <th>SF - Seguridad Física (Valor)</th>
+              <th>SF - Seguridad Física (Descripción)</th>
+              <th>MA - Medio Ambiente (Valor)</th>
+              <th>MA - Medio Ambiente (Descripción)</th>
+              <th>IO - Impacto Operacional (Valor)</th>
+              <th>IO - Impacto Operacional (Descripción)</th>
+              <th>OR - Costos de Reparación (Valor)</th>
+              <th>OR - Costos de Reparación (Descripción)</th>
+              <th>FO - Flexibilidad Operacional (Valor)</th>
+              <th>FO - Flexibilidad Operacional (Descripción)</th>
+              <th>Cálculo de Severidad</th>
+              <th>Ocurrencia (Valor)</th>
+              <th>Ocurrencia (Descripción)</th>
+              <th>Ocurrencia Matemática</th>
+              <th>Probabilidad de Detección (Valor)</th>
+              <th>Probabilidad de Detección (Descripción)</th>
+              <th>RPN</th>
+              <th>Riesgo</th>
+              <th colspan="4">Acciones</th> <!-- columna para los botones -->
+
+            </tr>
+          </thead>
+          <tbody>
+            {% for fmea in fmeas %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ fmea['sistema'] }}</td>
+              <td>{{ fmea['falla_funcional'] }}</td>
+              <td>{{ fmea['componente'] }}</td>
+              <td>{{ fmea['codigo_modo_falla'] }}</td>
+              <td>{{ fmea['consecutivo_modo_falla'] }}</td>
+              <td>{{ fmea['descripcion_modo_falla'] }}</td>
+              <td>{{ fmea['causa'] }}</td>
+              <td>{{ fmea['mecanismo_falla'] }}</td>
+              <td>{{ fmea['detalle_falla'] }}</td>
+              <td>{{ fmea['MTBF'] }}</td>
+              <td>{{ fmea['MTTR'] }}</td>
+              <td>{{ fmea['fallo_oculto_valor'] }}</td>
+              <td>{{ fmea['fallo_oculto_descripcion'] }}</td>
+              <td>{{ fmea['seguridad_fisica_valor'] }}</td>
+              <td>{{ fmea['seguridad_fisica_descripcion'] }}</td>
+              <td>{{ fmea['medio_ambiente_valor'] }}</td>
+              <td>{{ fmea['medio_ambiente_descripcion'] }}</td>
+              <td>{{ fmea['impacto_operacional_valor'] }}</td>
+              <td>{{ fmea['impacto_operacional_descripcion'] }}</td>
+              <td>{{ fmea['costos_reparacion_valor'] }}</td>
+              <td>{{ fmea['costos_reparacion_descripcion'] }}</td>
+              <td>{{ fmea['flexibilidad_operacional_valor'] }}</td>
+              <td>{{ fmea['flexibilidad_operacional_descripcion'] }}</td>
+              <td>{{ fmea['calculo_severidad'] }}</td>
+              <td>{{ fmea['ocurrencia_valor'] }}</td>
+              <td>{{ fmea['ocurrencia_descripcion'] }}</td>
+              <td>{{ fmea['ocurrencia_mate'] }}</td>
+              <td>{{ fmea['probabilidad_deteccion_valor'] }}</td>
+              <td>{{ fmea['probabilidad_deteccion_descripcion'] }}</td>
+              <td>{{ fmea['RPN']}}</td>
+              <td>{{ fmea['nombre_riesgo']}}</td>
+              <td>
+                <!-- Botón de Editar -->
+                <a href="{{ url_for('editar_FMEA', fmea_id=fmea['id'],  id_equipo_info=id_equipo_info) }}" class="btn btn-sm btn-editar boton"><i class="bi bi-pen pen" ></i></a>
+              </td>
+              <td>
+                <!-- Botón de Eliminar -->
+                <form action="{{ url_for('eliminar_FMEA', fmea_id=fmea['id'],id_equipo_info=id_equipo_info) }}" method="POST" style="display:inline-block;">
+                  <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash fs-5"></i></button>
+                </form>
+              </td>
+              <td>
+                {% if fmea['id'] in fmeas_con_rcm %}
+                  <button class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar RCM">
+                    <a href="{{url_for('editar_RCM', id_equipo_info=id_equipo_info,fmea_id=fmea['id'])}}">RCM  <i class="bi bi-pencil FMEA-edit"></i></a>
+                  </button>
+                {% else %}
+                  <button class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Crear RCM">
+                    <a href="{{url_for('crear_RCM', fmea_id=fmea['id'],  id_equipo_info=id_equipo_info)}}">RCM  <i class="bi bi-plus-circle FMEA-edit"></i></a>
+                  </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>          
+        </table>
+      </div>
+      <button class="scroll-button right scroll-right">▶</button>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/editar_FMEA.js') }}"></script>
+<script src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+<script>
+  updateButtonVisibility();
+</script>
+{% endblock %}

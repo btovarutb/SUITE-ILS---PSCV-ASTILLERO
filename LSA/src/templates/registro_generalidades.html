@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% block custom %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/generalidades.css') }}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}
+
+
+{% block body %}
+<div id="header">
+    <div id="volverBtn">
+        <a class="volverBtn" href="{{ request.referrer or url_for('index') }}">
+            <i class="bi bi-chevron-left"></i>
+            Volver
+        </a>
+    </div>
+    {% if id_equipo_info %}
+      <p>Información del equipo</p>
+    {% else %}
+      <p>Crear equipo</p>
+    {% endif %}
+    
+</div>
+
+<div class="container" id="reporte">
+    <div class="buttons">
+        <button class="tab-button btn active" data-target="section1">Generalidades</button>
+        <button class="tab-button btn" data-target="section2">Detalles del Equipo</button>
+        <button class="tab-button btn" data-target="section3">Procedimientos</button>
+        <button class="tab-button btn" data-target="section4">Representaciones esquematicas</button>
+    </div>
+
+    <div class="content">
+        <!-- Generalidades -->
+        <form id="generalidades-form" method="post" enctype="multipart/form-data">
+            <div id="section1" class="zone section padding active">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="fecha" class="form-label">Fecha de Creación</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="nombre_equipo" class="form-label">Nombre del equipo</label>
+                        <input type="text" class="form-control" id="nombre_equipo" name="nombre_equipo">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="responsable" class="form-label">Responsable</label>
+                        <div class="input-group">
+                            <select class="form-control" id="responsable" name="responsable">
+                                {% for persona in responsables %}
+                                <option value="{{ persona.id }}">{{ persona.nombre_completo }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn btn-secondary" id="add_personal">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger" id="delete_personal">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="grupo_constructivo" class="form-label">Grupo Constructivo</label>
+                        {% if desde_index %}
+                        <input type="text" class="form-control" id="grupo_constructivo" name="grupo_constructivo"
+                            value="{{ grupo_seleccionado.nombre if grupo_seleccionado else '' }}" readonly>
+                        <input type="hidden" name="grupo_constructivo"
+                            value="{{ grupo_seleccionado.id if grupo_seleccionado else '' }}">
+                        {% else %}
+                        <select class="form-control" id="grupo_constructivo" name="grupo_constructivo">
+                            <option value="">Seleccione Grupo Constructivo</option>
+                            {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}"
+                                {% if grupo_seleccionado and grupo.id == grupo_seleccionado.id %}selected{% endif %}>
+                                {{ grupo.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="subgrupo_constructivo" class="form-label">Sub-grupo Constructivo</label>
+                        {% if desde_index %}
+                        <input type="text" class="form-control" id="subgrupo_constructivo" name="subgrupo_constructivo"
+                            value="{{ subgrupo_seleccionado.nombre if subgrupo_seleccionado else '' }}" readonly>
+                        <input type="hidden" name="subgrupo_constructivo"
+                            value="{{ subgrupo_seleccionado.id if subgrupo_seleccionado else '' }}">
+                        {% else %}
+                        <select class="form-control" id="subgrupo_constructivo" name="subgrupo_constructivo">
+                            <option value="">Seleccione Subgrupo Constructivo</option>
+                            {% for subgrupo in subgrupos %}
+                            <option value="{{ subgrupo.id }}"
+                                {% if subgrupo_seleccionado and subgrupo.id == subgrupo_seleccionado.id %}selected{% endif %}>
+                                {{ subgrupo.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="sistema" class="form-label">Sistema</label>
+                        {% if desde_index %}
+                        <input type="text" class="form-control" id="sistema" value="{{ sistema_seleccionado.nombre if sistema_seleccionado else '' }}" readonly>
+                        <input type="hidden" name="sistema" value="{{ sistema_seleccionado.id if sistema_seleccionado else '' }}">
+                        {% else %}
+                        <select class="form-control" id="sistema" name="sistema">
+                            <option value="">Seleccione Sistema</option>
+                            {% for sistema in sistemas %}
+                            <option value="{{ sistema.id }}"
+                                {% if sistema_seleccionado and sistema.id == sistema_seleccionado.id %}selected{% endif %}>
+                                {{ sistema.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="tipo_equipo" class="form-label">Tipo de equipo</label>
+                        <select class="form-control" id="tipo_equipo" name="tipo_equipo">
+                            <option value="">Seleccione Tipo de Equipo</option>
+                            {% for tipo in tipos_equipos %}
+                            <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="equipo" class="form-label">Equipo</label>
+                        <select class="form-control" id="equipo" name="equipo">
+                            <option value="">Seleccione Equipo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+            </div>
+
+            <!-- Detalles del Equipo -->
+            <div id="section2" class="zone section padding">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="marca" class="form-label">Marca</label>
+                        <input type="text" class="form-control" id="marca" name="marca">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="modelo" class="form-label">Modelo</label>
+                        <input type="text" class="form-control" id="modelo" name="modelo">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="peso_seco" class="form-label">Peso seco (kg)</label>
+                        <input type="number" class="form-control" id="peso_seco" name="peso_seco">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dimensiones" class="form-label">Dimensiones (mm x mm x mm)</label>
+                        <input type="text" class="form-control" id="dimensiones" name="dimensiones">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+            </div>
+
+            <!-- Procedimientos -->
+            <div id="section3" class="zone section padding">
+                <div class="mt-3">
+                    <label for="procedimiento_arranque" class="form-label">Procedimiento de arranque</label>
+                    <textarea id="procedimiento_arranque" name="procedimiento_arranque" class="form-control" rows="4" placeholder="Escribe tus comentarios aquí..."></textarea>
+                </div>
+                <div class="mt-3">
+                    <label for="procedimiento_parada" class="form-label">Procedimiento de parada</label>
+                    <textarea id="procedimiento_parada" name="procedimiento_parada" class="form-control" rows="4" placeholder="Escribe tus comentarios aquí..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+            </div>
+            
+            <!-- Representaciones Esquemáticas -->
+            <div id="section4" class="zone section padding">
+                <div class="mt-3">
+                    <label for="diagrama_flujo" class="form-label">Diagrama de Flujo del Subsistema Donde se encuentra Ubicado el Equipo</label>
+                    <input type="file" class="form-control" id="diagrama_flujo" name="diagrama_flujo" accept="image/*">
+                </div>
+                <div class="mt-3">
+                    <label for="diagrama_caja_negra" class="form-label">Diagrama de Caja Negra de la función</label>
+                    <input type="file" class="form-control" id="diagrama_caja_negra" name="diagrama_caja_negra" accept="image/*">
+                </div>
+                <div class="mt-3">
+                    <label for="diagrama_caja_transparente" class="form-label">Diagrama caja transparente de la función</label>
+                    <input type="file" class="form-control" id="diagrama_caja_transparente" name="diagrama_caja_transparente" accept="image/*">
+                </div>
+                <div class="mt-3">
+                    <label for="diagrama_procesos" class="form-label">Diagrama de Procesos</label>
+                    <input type="file" class="form-control" id="diagrama_procesos" name="diagrama_procesos" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            const targetSection = document.getElementById(this.dataset.target);
+            targetSection.classList.add('active');
+
+            // Cargar contenido dinámicamente
+            const iframe = targetSection.querySelector('iframe');
+            if (iframe && !iframe.src) {
+                iframe.src = iframe.dataset.src;
+            }
+        });
+    });
+</script>
+<script src="{{ url_for('static', filename='js/generalidades.js') }}"></script>
+<script src="{{ url_for('static', filename='js/global.js') }}"></script>
+
+<style>
+    .section {
+        display: none;
+    }
+
+    .section.active {
+        display: block;
+    }
+
+    .tab-button.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+</style>
+
+{% endblock %}
+

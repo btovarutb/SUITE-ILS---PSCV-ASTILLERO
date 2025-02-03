@@ -1,0 +1,66 @@
+{% extends './base.html' %}
+
+{% block nombre %}LSA{% endblock %}
+{% block body %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/desglose.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fondo.css') }}">
+
+    <div class="main-container" id="viewIdentifier" data-view="lsa_view">
+        <div class="search-bar">
+            <div class="d-flex align-items-center">
+                <div id="volverBtn" class="d-none">
+                    <button class="volverBtn">
+                        <i class="bi bi-chevron-left"></i>
+                        Volver
+                    </button>
+                </div>
+                <p style="text-transform: uppercase;">Desglose para {{ nombre_buque }}</p>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <div class="search-container">
+                    <input type="text" id="searchbox" placeholder="Buscar equipos">
+                    <button id="buscarBtnBuque">
+                        <i class="bi bi-search" style="font-size: 10px; color: white"></i>
+                    </button>
+                </div>
+                <button id="nuevoEquipoBtn" class="nuevo-equipo-btn" 
+                onclick="window.location.href='{{ url_for('registro_generalidades') }}'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                    </svg>
+                    Nuevo equipo
+                </button>
+            </div>
+        </div>
+
+        <div id="resultados" class="grid-container">
+            {% for grupo in grupos %}
+            <div class="card" data-id="{{ grupo.id }}" data-type="grupo">
+                <!-- Mostrar imagen según el valor de numeracion -->
+                {% if grupo.numeracion == 200 %}
+                    <img src="{{ url_for('static', filename='img/1.png') }}" alt="Planta de Propulsión">
+                {% elif grupo.numeracion == 300 %}
+                    <img src="{{ url_for('static', filename='img/2.png') }}" alt="Planta Eléctrica">
+                {% elif grupo.numeracion == 400 %}
+                    <img src="{{ url_for('static', filename='img/3.png') }}" alt="Sistemas Auxiliares">
+                {% elif grupo.numeracion == 500 %}
+                    <img src="{{ url_for('static', filename='img/4.png') }}" alt="Sistemas de Navegación">
+                {% elif grupo.numeracion == 600 %}
+                    <img src="{{ url_for('static', filename='img/5.png') }}" alt="Sistemas de Armamento">
+                {% else %}
+                    <img src="{{ url_for('static', filename='img/6.png') }}" alt="Imagen por defecto">
+                {% endif %}
+                <div class="overlay-text">{{ grupo.numeracion }}</div>
+                <!-- Mostrar número y nombre -->
+                <p class="grupo">{{ grupo.nombre }}</p>
+            </div>
+            {% endfor %}
+        </div>    
+        <span id="currentBuqueId" data-value="{{ buque_id }}"></span>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/desglose.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/global.js') }}"></script>
+
+{% endblock %}

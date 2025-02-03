@@ -1,0 +1,87 @@
+{% extends './base.html' %}
+
+{% block title %}Cotecmar || Editar Herramienta Especial{% endblock %}
+
+{% block custom %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/herramientas_especiales.css') }}">
+{% endblock %}
+
+{% block nombre %}LSA | Editar Herramienta Especial{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h2 class="section-title text-center">Editar Herramienta Especial</h2>
+            <br>
+            <form id="editar-herramienta-form" enctype="multipart/form-data" data-herramienta-id="{{ herramienta.id }}">
+                <input type="hidden" id="id_equipo_info" name="id_equipo_info" value="{{ id_equipo_info }}">
+                <div class="row">
+                    <!-- Primera columna -->
+                    <div class="col-md-4 my-4">
+                        <label for="nombre_herramienta" class="form-label">Nombre de la herramienta</label>
+                        <input type="text" class="form-control" id="nombre_herramienta" name="nombre_herramienta" value="{{ herramienta.nombre_herramienta }}">
+
+                        <label for="dibujo_seccion_transversal" class="form-label mt-3">Dibujo de sección transversal</label>
+                        <input type="file" class="form-control" id="dibujo_seccion_transversal" name="dibujo_seccion_transversal" accept=".jpg, .jpeg, .png, .pdf">
+
+                        {% if herramienta.dibujo_seccion_transversal %}
+                        <p>Imagen actual:</p>
+                        <img src="data:image/png;base64,{{ herramienta.dibujo_seccion_transversal|b64encode }}" alt="Dibujo actual" style="max-width: 200px; max-height: 200px;">
+                        {% endif %}
+
+                        <label for="manual_referencia" class="form-label mt-3">Manual referenciado</label>
+                        <input type="text" class="form-control" id="manual_referencia" name="manual_referencia" value="{{ herramienta.manual_referencia }}">
+                    </div>
+
+                    <!-- Segunda columna -->
+                    <div class="col-md-4 my-4">
+                        <label for="parte_numero" class="form-label">Parte número</label>
+                        <input type="text" class="form-control" id="parte_numero" name="parte_numero" value="{{ herramienta.parte_numero }}">
+
+                        <div>
+                            <label for="valor" class="form-label mt-3">Costo</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="valor" name="valor" value="{{ herramienta.valor }}">
+                                <select class="form-select" id="moneda" name="moneda" style="width: auto;">
+                                    <option value="USD">USD</option>
+                                    <option value="EURO">EURO</option>
+                                    <option value="COP">COP</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <label for="cantidad" class="form-label mt-3">Cantidad</label>
+                        <input type="number" class="form-control" id="cantidad" name="cantidad" value="{{ herramienta.cantidad }}">
+
+                        <label for="nota" class="form-label mt-3">Nota</label>
+                        <textarea class="form-control" id="nota" name="nota">{{ herramienta.nota }}</textarea>
+                    </div>
+
+                    <!-- Tercera columna -->
+                    <div class="col-md-4 my-4">
+                        <!-- Campo "Tipo de herramienta" -->
+                        <label for="tipo_herramienta" class="form-label">Tipo de herramienta</label>
+                        <select class="form-control" id="tipo_herramienta" name="tipo_herramienta">
+                            <option value="">Seleccione un tipo</option>
+                            {% for tipo in tipos_herramientas %}
+                            <option value="{{ tipo.id_tipo_herramienta }}" {% if herramienta.id_tipo_herramienta == tipo.id_tipo_herramienta %}selected{% endif %}>{{ tipo.nombre_tipo }}</option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botón "Guardar cambios" -->
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-primary" id="btn-guardar-herramienta">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/editar_herramienta_especial.js') }}"></script>
+{% endblock %}

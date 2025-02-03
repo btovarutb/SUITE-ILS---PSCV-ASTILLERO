@@ -1,0 +1,21 @@
+<!-- mostrar_analisis_funcional_ext.html -->
+{% include 'mostrar_repuesto.html' %}
+<!-- Aquí puedes añadir o eliminar contenido específico -->
+{% block custom %}
+<style>
+    .col{
+        padding: 0;
+        padding-right: 40px;
+    }
+    .terminar {
+        display: none; /* Ocultar el botón */
+    }
+    .Terminar{
+        margin-left: 70px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+{%block content%}
+    <a class="terminar" href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" class="btn btn-primary1 Terminar">Terminar Repuestos</a>
+{% endblock %}

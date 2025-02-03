@@ -1,0 +1,55 @@
+body {
+    background-image: url('../img/bote.png'); /* Asegúrate de que la ruta sea correcta */
+    background-size: cover; /* Hace que la imagen cubra todo el fondo */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat; /* Evita la repetición de la imagen */
+    min-height: 100vh; /* Se asegura que cubra toda la altura de la pantalla */
+    width: 100%; /* Asegura que cubra todo el ancho */
+    overflow-x: hidden; /* Evita que aparezca un scroll horizontal si la imagen se desborda */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    /* Ajusta los elementos de la página para pantallas pequeñas */
+   
+
+    input[type="search"] {
+        width: 100%; /* Asegura que el input de búsqueda sea responsivo */
+    }
+
+    /* Ajusta otros elementos si es necesario */
+}
+
+.error{
+    background-color: aliceblue;
+    width: 750px;
+    display: flex;
+    border-radius: 5px;
+    padding: 80px;
+    box-shadow: 5px 5px 15px 5px #7899c8;
+}
+
+.vertical-line {
+    border-left: 2px solid #4578abbc; /* Color y grosor de la línea */
+    height:auto; /* Altura de la línea */
+    margin-right: 20px; /* Espacio entre la línea y el texto */
+}
+
+h1{
+    color:  #0c377f !important;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    justify-content: center;
+
+}
+
+.texto_error{
+    margin: 20px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
