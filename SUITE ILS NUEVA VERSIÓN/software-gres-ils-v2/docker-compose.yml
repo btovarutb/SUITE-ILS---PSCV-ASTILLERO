@@ -1,0 +1,58 @@
+version: '3.8'
+
+networks:
+  ils_network:
+    external: true
+
+services:
+  suiteils_v2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: suiteils_v2_container
+    ports:
+      - "8010:80"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:l00spNiwSWpOv+1H5iOORvmPWFvrkUy2uk29O7ujNnc=
+      - DB_HOST=ils_db_v2
+      - DB_PORT=3306
+      - DB_DATABASE=suiteils
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+    volumes:
+      - .:/var/www/html
+      - suiteils_storage:/var/www/html/storage
+    depends_on:
+      - db_v2
+    networks:
+      - ils_network
+
+  db_v2:
+    image: mysql:8.0
+    container_name: ils_db_v2
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: suiteils
+    ports:
+      - "3310:3306"
+    volumes:
+      - suiteils_mysql_data:/var/lib/mysql
+      - ./DatabaseMYSQL/suiteils.sql:/docker-entrypoint-initdb.d/suiteils.sql
+    networks:
+      - ils_network
+
+  # Servicio para esperar a que MySQL esté listo antes de ejecutar consultas
+  mysql-wait_v2:
+    image: busybox
+    container_name: mysql_wait_v2
+    entrypoint: ["sh", "-c", "until nc -z -v -w30 db_v2 3306; do echo 'Waiting for MySQL'; sleep 5; done; echo 'MySQL is up';"]
+    depends_on:
+      - db_v2
+    networks:
+      - ils_network
+
+volumes:
+  suiteils_mysql_data:
+  suiteils_storage:

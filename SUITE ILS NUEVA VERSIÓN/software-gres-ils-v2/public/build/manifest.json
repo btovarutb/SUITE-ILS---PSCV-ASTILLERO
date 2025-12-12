@@ -1,0 +1,27 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-a4181a99.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-1ca61c52.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  },
+  "resources/js/gres-equipos-colab.js": {
+    "file": "assets/gres-equipos-colab-ae24b1ae.js",
+    "isEntry": true,
+    "src": "resources/js/gres-equipos-colab.js"
+  },
+  "resources/js/gres-equipos-mec.js": {
+    "file": "assets/gres-equipos-mec-53611f95.js",
+    "isEntry": true,
+    "src": "resources/js/gres-equipos-mec.js"
+  },
+  "resources/js/gres-mec.js": {
+    "file": "assets/gres-mec-9c3605c5.js",
+    "isEntry": true,
+    "src": "resources/js/gres-mec.js"
+  }
+}
