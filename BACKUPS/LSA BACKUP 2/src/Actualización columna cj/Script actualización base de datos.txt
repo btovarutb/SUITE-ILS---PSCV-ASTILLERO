@@ -1,0 +1,5 @@
+# Acceder al contenedor de Docker e ingresar a MySQL, luego ejecutar los comandos SQL
+docker exec -it lsa_db_container bash -c "mysql -uroot -p -e '\
+USE lsa; \
+ALTER TABLE equipo_info ADD COLUMN cj VARCHAR(50); \
+'"

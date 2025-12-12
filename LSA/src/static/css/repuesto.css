@@ -21,7 +21,7 @@ body {
 .btn-primary {
     background-color: #003366;
     color: white;
-    padding: 10px 20px;
+    padding:7px 20px;
     border: none;
     font-size: 16px;
     cursor: pointer;
@@ -97,7 +97,7 @@ textarea {
 .btn-danger{
     background-color: #730C02;
     border-color: #730C02;
-    padding: 8px;
+    padding: 6px;
 }
 
 .btn btn-primary{

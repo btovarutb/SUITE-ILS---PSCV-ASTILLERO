@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/scroll.css') }}">
 {%endblock%}
 
-{%block nombre%}{{ equipo.nombre_equipo }}{%endblock%}
 
 {% block body %}
 
@@ -21,13 +20,13 @@
                 Volver
             </a>
         </div>
-        <p>{{ equipo.nombre_equipo }}</p>
+        <p id="nombreEquipo">{{ equipo.nombre_equipo }}</p>
     </div>
 
 
     <div class="container" id="reporte" >
         <div class="row toolBar">
-            <div class="col-11 m-0">
+            <div class="col-12 m-0">
                 <div class="buttons">
                     <button class="tab-button btn active" data-target="section1">Generalidades</button>
                     <button class="tab-button btn" data-target="section2">Detalles del Equipo</button>
@@ -40,13 +39,11 @@
                     <button class="tab-button btn" data-target="section9">FMEA</button>
                     <button class="tab-button btn" data-target="section10" id="rcmTabButton" disabled>RCM</button>
                     <button class="tab-button btn" data-target="section11" id="mtaTabButton" disabled>MTA LORA</button>
-                    <button class="tab-button btn" data-target="section12">FUA</button>                    
+                    <button class="tab-button btn" data-target="section12">FUA</button>   
+                    <button id="btn-eliminar-equipo" style="border-radius: .25rem;" class="btn btn-danger no-print" data-equipo-id="{{ id_equipo_info }}">
+                        <i class="bi bi-trash-fill" style="color: white;"></i>
+                    </button>                 
                 </div>
-            </div>
-            <div class="col-1 pt-3" style="align-items: start; justify-content: end; display: flex; padding-right: 1.5rem;">
-                <button id="btn-eliminar-equipo" style="border-radius: 10px;" class="btn btn-danger no-print" data-equipo-id="{{ id_equipo_info }}">
-                    <i class="bi bi-trash-fill" style="color: whitesmoke;"></i>
-                </button>
             </div>
         </div>
 
@@ -61,66 +58,86 @@
                   <!-- Generalidades -->
             <div id="section1" class="zone section active padding pt-3">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                    <h2 style="text-align: center; margin-bottom: 0;">Generalidades</h2>
+                    <h3 style="text-align: center; margin-bottom: 0;">Generalidades</h3>
                     <button data-url="{{ url_for('editar_equipo', id_equipo_info=id_equipo_info) }}" data-section="section1" class="btn btn-primary no-print" style="padding: 8px 15px;border-radius: 10px;">
                         <i class="bi bi-pen" style="color: whitesmoke; font-size: 14px;"></i>
                     </button>
                 </div>
                 <div class="row pt-3">
                     <div class="col-md-6">
+                         <!-- CJ destacado -->
+                        <div class="mb-2">
+                            <label><strong style=" font-size: 18px;">CÓDIGO JERÁRQUICO (CJ):</strong></label>
+                            <span style="font-weight: bold; font-size: 18px;">{{ equipo.cj }}</span>
+                        </div>
+
                         <p><strong>Nombre de equipo:</strong> {{ equipo.nombre_equipo }}</p>
                         <p><strong>Tipo de equipo:</strong> {{ tipo_equipo.nombre }}</p>
-                        <div class="mb-3">
-                            <label><b>Fecha de Creación:</b></label>
+                        <div class="mb-2">
+                            <label><strong>Fecha de Creación:</strong></label>
                             <span>{{ equipo.fecha }}</span>
                         </div>
                           
-                        <div class="mb-3">
-                            <label><b>Grupo constructivo:</b></label>
+                        <div class="mb-2">
+                            <label><strong>Grupo constructivo:</strong></label>
                             <span>{{ grupo_constructivo.nombre if grupo_constructivo else 'No disponible' }}</span>
                         </div>
                           
-                        <div class="mb-3">
-                            <label><b>Subgrupo constructivo:</b></label>
+                        <div class="mb-2">
+                            <label><strong>Subgrupo constructivo:</strong></label>
                             <span>{{ subgrupo_constructivo.nombre if subgrupo_constructivo else 'No disponible' }}</span>
                         </div>
                       
-                        <div class="mb-3">
-                            <label><b>Sistema:</b></label>
+                        <div class="mb-2">
+                            <label><strong>Sistema:</strong></label>
                             <span>{{ sistema.nombre }}</span>
                         </div>
+
+                        <div class="mb-2">
+                            <label><strong>Subsistema:</strong></label>
+                            <span>{{ subsistema.descripcion }}</span>
+                        </div>
                   
-                        <div class="mb-3">
-                            <label><b>Tipo de equipo:</b></label>
+                        <div class="mb-2">
+                            <label><strong>Tipo de equipo:</strong></label>
                             <span>{{ tipo_equipo.nombre if tipo_equipo else 'No disponible' }}</span>
                         </div>
                           
-                        <div class="mb-3">
-                            <label><b>Equipo:</b></label>
+                        <div class="mb-2">
+                            <label><strong>Equipo:</strong></label>
                             <span>{{ datos_equipo.nombre if datos_equipo else 'No disponible' }}</span>
                         </div>
                         
-                        <div class="mb-3">
-                            <label><b>Responsable:</b></label>
+                        <div class="mb-2">
+                            <label><strong>Responsable:</strong></label>
                             <span>{{ responsable.nombre_completo }}</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         {% if equipo.imagen %}
-                        <!-- Imagen en miniatura -->
-                        <img 
-                            src="data:image/png;base64,{{ equipo.imagen|b64encode }}" 
-                            class="imagen" 
-                            style="float: right; border: #d3d3d388 5px solid; border-radius: 8px; cursor: pointer; margin-right: 1rem;"
-                            data-bs-toggle="modal" 
-                            data-bs-target="#imageModal" 
-                            alt="Imagen del equipo"
-                            id="imagenEquipo"
-                        >
+                            <!-- Imagen en miniatura -->
+                            <img 
+                                src="data:image/png;base64,{{ equipo.imagen|b64encode }}" 
+                                class="imagen" 
+                                style="float: right; border: #d3d3d388 5px solid; border-radius: 8px; cursor: pointer; margin-right: 1rem;"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#imageModal" 
+                                alt="Imagen del equipo"
+                                id="imagenEquipo"
+                            >
+                        {% else %}
+                            <!-- Imagen por defecto -->
+                            <img 
+                                src="{{ url_for('static', filename='img/default_image.png') }}" 
+                                class="imagen" 
+                                style="float: right; border: #d3d3d388 5px solid; border-radius: 8px; cursor: pointer; margin-right: 1rem;"
+                                alt="Imagen por defecto"
+                                id="imagenEquipo"
+                            >
                         {% endif %}
                     </div>
-                    <div class="mb-3">
-                        <label><b>Descripción del Equipo:</b></label>
+                    <div class="mb-2" id="descripcionEquipo">
+                        <label><strong>Descripción del Equipo:</strong></label>
                         <span>{{ equipo.descripcion }}</span>
                     </div>
                 </div>
@@ -130,7 +147,7 @@
             <div id="section2" class="zone section padding pt-3">
                 <!-- Mantenemos el título como está -->
                 <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                    <h2 style="text-align: center; margin-bottom: 0;">Detalles del Equipo</h2>
+                    <h3 style="text-align: center; margin-bottom: 0;">Detalles del Equipo</h3>
                     <button data-url="{{ url_for('editar_equipo', id_equipo_info=id_equipo_info) }}" data-section="section2" class="btn btn-primary no-print" style="padding: 8px 15px;border-radius: 10px;">
                         <i class="bi bi-pen" style="color: whitesmoke; font-size: 14px;"></i>
                     </button>
@@ -146,7 +163,7 @@
                                     <p class="mt-2 mb-0" style="color: #495057;">{{ equipo.marca }}</p>
                                 </div>
                             </div>
-                            <div>
+                            <div class="mb-3">
                                 <div style="border-left: 4px solid #007bff; padding-left: 10px;">
                                     <strong style="font-size: 1.1rem;">Modelo</strong>
                                     <p class="mt-2 mb-0" style="color: #495057;">{{ equipo.modelo }}</p>
@@ -163,7 +180,7 @@
                                     <p class="mt-2 mb-0" style="color: #495057;">{{ equipo.dimensiones }} mm</p>
                                 </div>
                             </div>
-                            <div>
+                            <div class="mb-3">
                                 <div style="border-left: 4px solid #28a745; padding-left: 10px;">
                                     <strong style="font-size: 1.1rem;">Peso seco</strong>
                                     <p class="mt-2 mb-0" style="color: #495057;">{{ equipo.peso_seco }} kg</p>
@@ -177,7 +194,7 @@
             <!-- Procedimientos -->
             <div id="section3" class="zone section padding pt-3">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                    <h2 style="text-align: center; margin-bottom: 0;">Procedimientos</h2>
+                    <h3 style="text-align: center; margin-bottom: 0;">Procedimientos</h3>
                     <button data-url="{{ url_for('editar_equipo', id_equipo_info=id_equipo_info) }}" data-section="section3" class="btn btn-primary no-print" style="padding: 8px 15px;border-radius: 10px;">
                         <i class="bi bi-pen" style="color: whitesmoke; font-size: 14px;"></i>
                     </button>
@@ -189,7 +206,7 @@
             <!-- Representaciones esquemáticas -->
             <div id="section4" class="zone section padding pt-3">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                    <h2 style="text-align: center; margin-bottom: 0;">Representaciones Esquemáticas</h2>
+                    <h3 style="text-align: center; margin-bottom: 0;">Representaciones Esquemáticas</h3>
                     <button data-url="{{ url_for('editar_equipo', id_equipo_info=id_equipo_info) }}" data-section="section4" class="btn btn-primary no-print" style="padding: 8px 15px;border-radius: 10px;">
                         <i class="bi bi-pen" style="color: whitesmoke; font-size: 14px;"></i>
                     </button>
@@ -223,7 +240,7 @@
             <!-- Datos de Fiabilidad -->
             <div id="section5" class="zone section padding pt-3">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 12px; height: 40px;">
-                    <h2 style="text-align: center; margin-bottom: 0;">Datos de Fiabilidad</h2>
+                    <h3 style="text-align: center; margin-bottom: 0;">Datos de Fiabilidad</h3>
                 </div>
                 <div class="row d-flex pt-3">
                     <div class="col-6">
@@ -247,7 +264,6 @@
                         </p>
                     </div>
                 </div>
-                
             </div>
 
             <!-- Incluir Análisis Funcional -->
@@ -353,6 +369,9 @@
     <script src="{{ url_for('static', filename='js/global.js') }}"></script>
     <script src="{{ url_for('static', filename='js/equipo.js') }}"></script>
     <script src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
 
 {% endblock %}
 

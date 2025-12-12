@@ -1,0 +1,515 @@
+{% extends 'base.html' %}
+
+{% block title %}Cotecmar || Editar Equipo{% endblock %}
+
+{% block custom %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/generalidades.css') }}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %}
+
+{% block title %}LSA | Editar Equipo{% endblock %}
+
+
+{% block body %}
+<div id="header">
+  <div id="volverBtn">
+      <a class="volverBtn" href="{{ request.referrer or url_for('index') }}">
+          <i class="bi bi-chevron-left"></i>
+          Volver
+      </a>
+  </div>
+
+  <p>Editar equipo "{{equipo. nombre_equipo}}"</p>
+
+
+</div>
+
+<div class="container" id="reporte">
+  <div class="buttons">
+    <button class="tab-button btn {% if active_section == 'section1' %}active{% endif %}" data-target="section1">Generalidades</button>
+    <button class="tab-button btn {% if active_section == 'section2' %}active{% endif %}" data-target="section2">Detalles del Equipo</button>
+    <button class="tab-button btn {% if active_section == 'section3' %}active{% endif %}" data-target="section3">Procedimientos</button>
+    <button class="tab-button btn {% if active_section == 'section4' %}active{% endif %}" data-target="section4">Representaciones esquemáticas</button>
+  </div>
+
+  <div class="content">
+    <!-- Generalidades -->
+    <form id="form" method="post" enctype="multipart/form-data">
+   
+      <div id="section1" class="zone section padding {% if active_section == 'section1' %}active{% endif %}">
+          <div class="row">
+            <div class="col-md-4">
+              <label for="fecha" class="form-label">Fecha</label>
+              <input type="date" class="form-control" id="fecha" name="fecha" value="{{ equipo.fecha.strftime('%Y-%m-%d') if equipo.fecha else '' }}">
+            </div>
+            <div class="col-md-4">
+              <label for="nombre_equipo" class="form-label">Nombre del equipo</label>
+              <input type="text" class="form-control" id="nombre_equipo" name="nombre_equipo" value="{{ equipo.nombre_equipo }}">
+            </div>
+            <div class="col-md-4">
+              <label for="responsable" class="form-label">Responsable</label>
+              <div class="input-group">
+                <select class="form-control" id="responsable" name="responsable">
+                  {% for persona in responsables %}
+                  <option value="{{ persona.id }}" {% if responsable and responsable['id'] == persona.id %} selected {% endif %}>
+                    {{ persona.nombre_completo }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <button type="button" class="btn btn-secondary" id="add_personal"><i class="bi bi-plus-circle"></i></button>
+                <button type="button" class="btn btn-danger" id="delete_personal"><i class="bi bi-trash-fill"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <label for="grupo_constructivo" class="form-label">Grupo Constructivo</label>
+              <select class="form-control" id="grupo_constructivo" name="grupo_constructivo">
+                <option value="">Seleccione Grupo Constructivo</option>
+                {% for grupo in grupos %}
+                <option value="{{ grupo.id }}" {% if grupo_constructivo and grupo_constructivo['id'] == grupo.id %} selected {% endif %}>{{ grupo.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="subgrupo_constructivo" class="form-label">Sub-grupo Constructivo</label>
+              <select class="form-control" id="subgrupo_constructivo" name="subgrupo_constructivo">
+                <option value="">Seleccione Subgrupo Constructivo</option>
+                {% for subgrupo in subgrupos %}
+                <option value="{{ subgrupo['id'] }}" {% if subgrupo_constructivo and subgrupo_constructivo['id'] == subgrupo['id'] %} selected {% endif %}>{{ subgrupo['nombre'] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <label for="sistema" class="form-label">Sistema</label>
+              <select class="form-control" id="sistema" name="sistema">
+                <option value="">Seleccione Sistema</option>
+                {% for sistema_item in sistemas %}
+                <option value="{{ sistema_item['id'] }}" {% if sistema and sistema['id'] == sistema_item['id'] %} selected {% endif %}>{{ sistema_item['nombre'] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="tipo_equipo" class="form-label">Tipo de equipo</label>
+              <select class="form-control" id="tipo_equipo" name="tipo_equipo">
+                <option value="">Seleccione Tipo de Equipo</option>
+                {% for tipo in tipos_equipos %}
+                <option value="{{ tipo['id'] }}" {% if tipo_equipo and tipo_equipo['id'] == tipo['id'] %} selected {% endif %}>{{ tipo['nombre'] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <label for="equipo_select" class="form-label">Equipo</label>
+              <select class="form-control" id="equipo_select" name="equipo">
+                <option value="">Seleccione Equipo</option>
+                {% for equipo_item in equipos %}
+                <option value="{{ equipo_item['id'] }}" 
+                        {% if datos_equipo and datos_equipo['id'] == equipo_item['id'] %} selected {% endif %}>
+                    {{ equipo_item['nombre'] }}
+                </option>
+                {% endfor %}
+              </select>
+              
+              <div class="mt-3">
+                <label for="descripcion_equipo" class="form-label">Descripción del equipo</label>
+                <textarea id="descripcion_equipo" name="descripcion_equipo" class="form-control" rows="4">{{ equipo.descripcion }}</textarea>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="codigo_jerarquico" class="form-label">Código Jerárquico (CJ)</label>
+              <input type="text" class="form-control" id="codigo_jerarquico" name="codigo_jerarquico" value="{{ equipo.cj }}">
+              <div class="mt-3">
+                <label for="imagen_equipo" class="form-label">Imagen del equipo</label>
+                <input type="file" class="form-control" id="imagen_equipo" name="imagen_equipo" accept="image/*">
+                {% if equipo.imagen %}
+                <p>Imagen actual:</p>
+                <img src="data:image/png;base64,{{ equipo.imagen|b64encode }}" alt="Imagen del equipo" style="max-width: 200px; max-height: 200px;">
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+      </div>
+
+      <!-- Detalles del Equipo -->
+      <div id="section2" class="zone section padding {% if active_section == 'section2' %}active{% endif %}">
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <label for="marca" class="form-label">Marca</label>
+              <input type="text" class="form-control" id="marca" name="marca" value="{{ equipo.marca }}">
+            </div>
+            <div class="col-md-6">
+              <label for="modelo" class="form-label">Modelo</label>
+              <input type="text" class="form-control" id="modelo" name="modelo" value="{{ equipo.modelo }}">
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <label for="peso_seco" class="form-label">Peso seco (kg)</label>
+              <input type="number" class="form-control" id="peso_seco" name="peso_seco" value="{{ equipo.peso_seco }}">
+            </div>
+            <div class="col-md-6">
+              <label for="dimensiones" class="form-label">Dimensiones (mm x mm x mm)</label>
+              <input type="text" class="form-control" id="dimensiones" name="dimensiones" value="{{ equipo.dimensiones }}">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+      </div>
+
+      <!-- Procedimientos -->
+      <div id="section3" class="zone section padding {% if active_section == 'section3' %}active{% endif %}">
+          <div class="mt-3">
+            <label for="procedimiento_arranque" class="form-label">Procedimiento de arranque</label>
+            <textarea id="procedimiento_arranque" name="procedimiento_arranque" class="form-control" rows="4">{{ procedimiento.arranque }}</textarea>
+          </div>
+          <div class="mt-3">
+            <label for="procedimiento_parada" class="form-label">Procedimiento de parada</label>
+            <textarea id="procedimiento_parada" name="procedimiento_parada" class="form-control" rows="4">{{ procedimiento.parada }}</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+      </div>
+    
+      <!-- Representaciones Esquemáticas -->
+      <div id="section4" class="zone section padding {% if active_section == 'section4' %}active{% endif %}">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mt-3">
+                <label for="diagrama_flujo" class="form-label">Diagrama de flujo del subsistema</label>
+                <input type="file" class="form-control" id="diagrama_flujo" name="diagrama_flujo" accept="image/*">
+                {% if diagrama and diagrama.diagrama_flujo %}
+                <p>Diagrama actual:</p>
+                <img src="data:image/png;base64,{{ diagrama.diagrama_flujo|b64encode }}" alt="Diagrama de flujo" style="max-width: 200px; max-height: 200px;">
+                {% endif %}
+              </div>
+              <div class="mt-3">
+                <label for="diagrama_caja_negra" class="form-label">Diagrama caja negra de la función</label>
+                <input type="file" class="form-control" id="diagrama_caja_negra" name="diagrama_caja_negra" accept="image/*">
+                {% if diagrama and diagrama.diagrama_caja_negra %}
+                <p>Diagrama actual:</p>
+                <img src="data:image/png;base64,{{ diagrama.diagrama_caja_negra|b64encode }}" alt="Diagrama caja negra" style="max-width: 200px; max-height: 200px;">
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mt-3">
+                <label for="diagrama_caja_transparente" class="form-label">Diagrama caja transparente de la función</label>
+                <input type="file" class="form-control" id="diagrama_caja_transparente" name="diagrama_caja_transparente" accept="image/*">
+                {% if diagrama and diagrama.diagrama_caja_transparente %}
+                <p>Diagrama actual:</p>
+                <img src="data:image/png;base64,{{ diagrama.diagrama_caja_transparente|b64encode }}" alt="Diagrama caja transparente" style="max-width: 200px; max-height: 200px;">
+                {% endif %}
+              </div>
+              <div class="mt-3">
+                <label for="diagrama_procesos" class="form-label">Diagrama de Procesos</label>
+                <input type="file" class="form-control" id="diagrama_procesos" name="diagrama_procesos" accept="image/*">
+              </div>
+            </div>
+          </div>
+            
+          <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+      </div>
+    </form>
+</div>
+
+</div>
+
+
+<!-- JavaScript para los dropdowns dependientes -->
+<script>
+$(document).ready(function () {
+    // Funciones para cargar subgrupos, sistemas y equipos
+    function cargarSubgrupos(grupoId, selectedSubgrupoId) {
+        if (grupoId) {
+            $.ajax({
+                url: '/api/subgrupos/' + grupoId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var subgrupoDropdown = $('#subgrupo_constructivo');
+                    var currentValue = subgrupoDropdown.val(); // Obtén el valor actual
+
+                    subgrupoDropdown.empty().append('<option value="">Seleccione Subgrupo Constructivo</option>');
+
+                    $.each(data, function (index, subgrupo) {
+                        var selected = (subgrupo.id == selectedSubgrupoId || subgrupo.id == currentValue) ? 'selected' : '';
+                        subgrupoDropdown.append('<option value="' + subgrupo.id + '" ' + selected + '>' + subgrupo.nombre + '</option>');
+                    });
+
+                    // Cargar sistemas solo si hay un subgrupo seleccionado
+                    if (selectedSubgrupoId || currentValue) {
+                        cargarSistemas(selectedSubgrupoId || currentValue, '{{ equipo.sistema_id }}');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al obtener subgrupos:', error);
+                }
+            });
+        } else {
+            $('#subgrupo_constructivo, #sistema, #equipo_select').empty().append('<option value="">Seleccione una opción</option>');
+        }
+    }
+
+    function cargarSistemas(subgrupoId, selectedSistemaId) {
+        if (subgrupoId) {
+            $.ajax({
+                url: '/api/sistemas/' + subgrupoId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var sistemaDropdown = $('#sistema');
+                    var currentValue = sistemaDropdown.val(); // Obtén el valor actual
+
+                    sistemaDropdown.empty().append('<option value="">Seleccione Sistema</option>');
+
+                    $.each(data, function (index, sistema) {
+                        var selected = (sistema.id == selectedSistemaId || sistema.id == currentValue) ? 'selected' : '';
+                        sistemaDropdown.append('<option value="' + sistema.id + '" ' + selected + '>' + sistema.nombre + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al obtener sistemas:', error);
+                }
+            });
+        } else {
+            $('#sistema, #equipo_select').empty().append('<option value="">Seleccione una opción</option>');
+        }
+    }
+
+    function cargarEquipos(tipoEquipoId, selectedEquipoId) {
+        if (tipoEquipoId) {
+            $.ajax({
+                url: '/api/equipos_por_tipo/' + tipoEquipoId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var equipoDropdown = $('#equipo_select');
+                    var currentValue = equipoDropdown.val(); // Obtén el valor actual
+
+                    equipoDropdown.empty().append('<option value="">Seleccione Equipo</option>');
+
+                    $.each(data, function (index, equipo) {
+                        var selected = (equipo.id == selectedEquipoId || equipo.id == currentValue) ? 'selected' : '';
+                        equipoDropdown.append('<option value="' + equipo.id + '" ' + selected + '>' + equipo.nombre + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al obtener equipos:', error);
+                }
+            });
+        } else {
+            $('#equipo_select').empty().append('<option value="">Seleccione Equipo</option>');
+        }
+    }
+
+    // Inicialización al cargar la página
+    var grupoId = $('#grupo_constructivo').val();
+    var subgrupoId = '{{ equipo.subgrupo_constructivo_id }}';
+    var sistemaId = '{{ equipo.sistema_id }}';
+    var tipoEquipoId = '{{ equipo.tipo_equipo_id }}';
+    var equipoId = '{{ datos_equipo.id }}';
+
+    // Cargar dependencias según valores iniciales
+    if (grupoId) {
+        cargarSubgrupos(grupoId, subgrupoId);
+    }
+    if (tipoEquipoId) {
+        cargarEquipos(tipoEquipoId, equipoId);
+    }
+
+    // Eventos para dropdowns dependientes
+    $('#grupo_constructivo').on('change', function () {
+        var grupoId = $(this).val();
+        cargarSubgrupos(grupoId, null);
+    });
+
+    $('#subgrupo_constructivo').on('change', function () {
+        var subgrupoId = $(this).val();
+        cargarSistemas(subgrupoId, null);
+    });
+
+    $('#sistema').on('change', function () {
+        var sistemaId = $(this).val();
+        cargarEquipos(sistemaId, null);
+    });
+
+    $('#tipo_equipo').on('change', function () {
+        var tipoEquipoId = $(this).val();
+        cargarEquipos(tipoEquipoId, null);
+    });
+  });
+
+  $(document).ready(function() {
+    // Manejar agregar personal
+    $('#add_personal').on('click', function() {
+        var nombreCompleto = prompt('Ingrese el nombre completo del nuevo personal:');
+        if (nombreCompleto) {
+            $.ajax({
+                url: '/api/crear_personal',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ 'nombre_completo': nombreCompleto }),
+                success: function(data) {
+                    // Agregar la nueva opción al select
+                    $('#responsable').append('<option value="' + data.id + '">' + data.nombre_completo + '</option>');
+                    // Seleccionar la nueva opción
+                    $('#responsable').val(data.id);
+                },
+                error: function(xhr, status, error) {
+                    alert('Error al crear personal: ' + xhr.responseJSON.error);
+                }
+            });
+        }
+    });
+
+    // Manejar eliminar personal
+    $('#delete_personal').on('click', function() {
+        var id_personal = $('#responsable').val();
+        var nombre_personal = $('#responsable option:selected').text();
+        if (id_personal) {
+            if (confirm('¿Está seguro que desea eliminar a ' + nombre_personal + '?')) {
+                $.ajax({
+                    url: '/api/eliminar_personal',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 'id_personal': id_personal }),
+                    success: function(data) {
+                        // Eliminar la opción del select
+                        $('#responsable option[value="' + id_personal + '"]').remove();
+                        // Resetear el select
+                        $('#responsable').val('');
+                        alert('Personal eliminado');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error al eliminar personal: ' + xhr.responseJSON.error);
+                    }
+                });
+            }
+        } else {
+            alert('Por favor, seleccione un personal para eliminar');
+        }
+    });
+  });
+
+
+</script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const generalidadesForm = document.getElementById('generalidades-form');
+  
+      if (generalidadesForm) {
+          generalidadesForm.addEventListener('submit', function (event) {
+              event.preventDefault(); // Evitar el envío automático del formulario
+  
+              // Lista de IDs de los campos requeridos
+              const requiredFields = [
+                  'fecha',
+                  'nombre_equipo',
+                  'responsable',
+                  'grupo_constructivo',
+                  'subgrupo_constructivo',
+                  'sistema',
+                  'tipo_equipo',
+                  'equipo_select',
+                  //'aor',
+                  //'mtbf',
+                  //'gres_sistema',
+                  //'fiabilidad_equipo',
+                  //'criticidad_equipo',
+                  //'marca',
+                  //'modelo',
+                  //'peso_seco',
+                  //'dimensiones',
+                  // 'imagen_equipo', // Descomenta si la imagen es obligatoria
+                  //'descripcion_equipo',
+                  //'procedimiento_arranque',
+                  //'procedimiento_parada',
+                  // 'diagrama_flujo', // Descomenta si los diagramas son obligatorios
+                  // 'diagrama_caja_negra',
+                  // 'diagrama_caja_transparente'
+              ];
+  
+              let allFieldsFilled = true;
+  
+              // Verificar cada campo requerido
+              for (let i = 0; i < requiredFields.length; i++) {
+                  const fieldId = requiredFields[i];
+                  const fieldElement = document.getElementById(fieldId);
+  
+                  if (fieldElement) {
+                      if (fieldElement.tagName === 'SELECT') {
+                          // Para select, verificar que tenga un valor seleccionado
+                          if (fieldElement.value === '' || fieldElement.value === null) {
+                              allFieldsFilled = false;
+                              break;
+                          }
+                      } else if (fieldElement.tagName === 'INPUT' || fieldElement.tagName === 'TEXTAREA') {
+                          // Para input y textarea, verificar que no esté vacío
+                          if (fieldElement.value.trim() === '') {
+                              allFieldsFilled = false;
+                              break;
+                          }
+                      }
+                  } else {
+                      console.warn(`El elemento con ID "${fieldId}" no se encontró en el formulario.`);
+                  }
+              }
+  
+              if (!allFieldsFilled) {
+                  // Mostrar alerta si hay campos vacíos
+                  Swal.fire({
+                      title: 'Campos vacíos',
+                      text: 'Por favor, complete todos los campos requeridos antes de continuar.',
+                      icon: 'warning',
+                      confirmButtonText: 'Aceptar'
+                  });
+              } else {
+                  // Mostrar alerta de confirmación
+                  Swal.fire({
+                      title: '¿Desea guardar los cambios?',
+                      text: "Verifique que todos los datos estén correctos antes de continuar.",
+                      icon: 'question',
+                      showCancelButton: true,
+                      confirmButtonText: 'Sí, guardar',
+                      cancelButtonText: 'Cancelar',
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          // Enviar el formulario si el usuario confirma
+                          generalidadesForm.submit();
+                      }
+                  });
+              }
+          });
+      }
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+      // Agregar eventos a los botones para manejar cambios manuales
+      document.querySelectorAll('.tab-button').forEach(button => {
+          button.addEventListener('click', function () {
+              document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+              this.classList.add('active');
+
+              document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+              const targetSection = document.getElementById(this.dataset.target);
+              targetSection.classList.add('active');
+          });
+      });
+  });
+
+  </script>
+{% endblock %}

@@ -107,21 +107,53 @@
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label for="sistema" class="form-label">Sistema</label>
-                        {% if desde_index %}
-                        <input type="text" class="form-control" id="sistema" value="{{ sistema_seleccionado.nombre if sistema_seleccionado else '' }}" readonly>
-                        <input type="hidden" name="sistema" value="{{ sistema_seleccionado.id if sistema_seleccionado else '' }}">
+
+                        {% if sistema_seleccionado %}
+                            <!-- Se mantiene el hidden con el ID seleccionado -->
+                            <input type="hidden" name="sistema" id="sistema" value="{{ sistema_seleccionado.id }}">
+
+                            <!-- Nuevo: guardamos el código para el POST -->
+                            <input type="hidden" name="codigo" id="codigo" 
+                                value="{{ sistema_seleccionado.numeracion if sistema_seleccionado.numeracion else '' }}">
+
+                            <!-- Mostramos código - nombre en un control de solo lectura para el usuario -->
+                            <input type="text" class="form-control" 
+                                value="{{ (sistema_seleccionado.numeracion ~ ' - ' ~ sistema_seleccionado.nombre) 
+                                            if (sistema_seleccionado.numeracion and sistema_seleccionado.nombre) 
+                                            else (sistema_seleccionado.nombre or '') }}"
+                                readonly>
                         {% else %}
-                        <select class="form-control" id="sistema" name="sistema">
+                            <select class="form-control" id="sistema" name="sistema">
                             <option value="">Seleccione Sistema</option>
                             {% for sistema in sistemas %}
-                            <option value="{{ sistema.id }}"
-                                {% if sistema_seleccionado and sistema.id == sistema_seleccionado.id %}selected{% endif %}>
-                                {{ sistema.nombre }}
-                            </option>
+                                <option 
+                                value="{{ sistema.id }}"
+                                data-codigo="{{ sistema.numeracion }}"
+                                {% if sistema_seleccionado and sistema.id == sistema_seleccionado.id %}selected{% endif %}
+                                >
+                                {{ sistema.numeracion }} - {{ sistema.nombre }}
+                                </option>
                             {% endfor %}
-                        </select>
+                            </select>
+
+                            <!-- Hidden que enviaremos en el POST con el código -->
+                            <input type="hidden" name="codigo" id="codigo" value="">
                         {% endif %}
-                    </div>
+                        </div>
+
+                        <input type="hidden" name="codigo" id="codigo"
+                        value="{{ sistema_seleccionado.numeracion if sistema_seleccionado else '' }}">
+
+                    
+                    <div class="col-md-6">
+                        <label for="subsistema" class="form-label">Subsistema</label>
+                        <select class="form-control" id="subsistema" name="subsistema">
+                            <option value="">Seleccione Subsistema</option>
+                        </select>
+                    </div>                    
+                </div>
+
+                <div class="row mt-3">
                     <div class="col-md-6">
                         <label for="tipo_equipo" class="form-label">Tipo de equipo</label>
                         <select class="form-control" id="tipo_equipo" name="tipo_equipo">
@@ -131,9 +163,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                </div>
-
-                <div class="row mt-3">
+                    
                     <div class="col-md-6">
                         <label for="equipo" class="form-label">Equipo</label>
                         <select class="form-control" id="equipo" name="equipo">
@@ -141,8 +171,10 @@
                         </select>
                     </div>
                 </div>
-
-                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                <div class="mt-3">
+                    <label for="descripcion_equipo" class="form-label">Descripción del equipo</label>
+                    <textarea id="descripcion_equipo" name="descripcion_equipo" class="form-control" rows="4"></textarea>
+                </div>
             </div>
 
             <!-- Detalles del Equipo -->
@@ -167,7 +199,6 @@
                         <input type="text" class="form-control" id="dimensiones" name="dimensiones">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
             </div>
 
             <!-- Procedimientos -->
@@ -180,7 +211,6 @@
                     <label for="procedimiento_parada" class="form-label">Procedimiento de parada</label>
                     <textarea id="procedimiento_parada" name="procedimiento_parada" class="form-control" rows="4" placeholder="Escribe tus comentarios aquí..."></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
             </div>
             
             <!-- Representaciones Esquemáticas -->
@@ -201,8 +231,12 @@
                     <label for="diagrama_procesos" class="form-label">Diagrama de Procesos</label>
                     <input type="file" class="form-control" id="diagrama_procesos" name="diagrama_procesos" accept="image/*">
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
             </div>
+
+            <div class="padding">
+                <button type="submit" id="submitBtn" class="btn btn-primary">Guardar</button>
+            </div>
+            
         </form>
     </div>
 </div>
@@ -245,3 +279,8 @@
 
 {% endblock %}
 
+
+
+
+               
+           

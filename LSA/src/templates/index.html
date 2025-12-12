@@ -1,7 +1,7 @@
 {% extends './base.html' %}
 
 
-{% block nombre %}LSA{% endblock %}
+{% block title %}LSA{% endblock %}
 {% block body %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/desglose.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fondo.css') }}">
@@ -12,43 +12,51 @@
         <input type="hidden" id="codigo" value="{{ codigo }}">
 
         <div class="search-bar">
-            <div style="display: inline-flex; align-items: center;">
+            <div style="display: inline-flex; align-items: center; width: 60%;">
                 <div id="volverBtn">
                     <button class="volverBtn" style=" width: 100px; display: flex; align-items: center;"         
                     onclick="
                     {% if origen == 'realizarLsa' %}
-                        window.location.href='http://localhost:8010/lsa/{{ buque_id }}';
+                        redirectToLSA();
                     {% elif origen == 'sistemas' %}
-                        window.location.href='http://localhost:8010/buques/{{ buque_id }}/sistemas';
+                        redirectToSistemas();
                     {% endif %}
                     ">
                         <i class="bi bi-chevron-left"></i>
                         <span style="font-size: 14px;">Volver a sistemas</span>
                     </button>
                 </div>
+
+                {% if origen == "realizarLsa" %}
+                <div style="border-left: 3px solid #003366; display: flex; align-items: center; margin-left: 20px; padding-left: 10px;">
+                    <span class="font-bold mt-0 text-center" style="font-weight: bold; color: #003366; font-size: 40px;">LSA</span><br>
+                    <span class="text-gray-600 leading-tight" style="text-align: left; font-size: 14px; max-width: 140px; word-wrap: break-word; line-height: 1.3; padding-left: 4px">
+                        análisis de apoyo logístico
+                    </span>
+                </div>
+                {% endif %}
+
                 <div>
-                    <p style="margin-left: 20px; height: auto; align-content: center; margin-right: 10px;">
+                    <p style="margin-left: 0; height: auto; align-content: center; margin-right: 10px; font-size: 14px;">
                         {% if origen == "realizarLsa" %}
-                            REALIZAR LSA PARA EQUIPOS DEL SISTEMA <br>
+                            Equipos del sistema <br>
                         {% elif origen == "sistemas" %}
                             Equipos del sistema: <br>
                         {% else %}
                             SISTEMA: <br>
                         {% endif %}
-                        <span style="display: inline-block; margin-top: 2px;">{{ nombre }}</span>
+                        <span style="display: inline-block;">{{ nombre }}</span>
                     </p>
                 </div>
                 
 
             </div>
         
-            <div style="display: flex; gap: 1rem;">
+            <div style="display: flex; gap: 1rem; width: 45%; justify-content: flex-end; font-size: 14px;">
                 <div class="search-container">
                     <input type="text" id="searchbox" placeholder="Buscar equipos">
-                    <button id="buscarBtn">
-                        <i class="bi bi-search" style="font-size: 10px; color: white"></i>
-                    </button>
                 </div>
+
                 <button id="nuevoEquipoBtn" class="nuevo-equipo-btn" 
                     onclick="window.location.href='{{ url_for('registro_generalidades', buqueId=buque_id, sistemaId=sistema_id, mec=mec, codigo=codigo) }}'">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
@@ -65,19 +73,32 @@
         <div id="resultados" class="grid-container">
             {% if equipos %}
                 {% for equipo in equipos %}
-                <div class="card card_equipos" data-id="{{ equipo.id }}" data-type="equipo">
-                    <p>{{ equipo.nombre_equipo }}</p>
-                </div>
+                    <div class="card card_equipos" data-id="{{ equipo.id }}" data-type="equipo">
+                        <img 
+                            src="{% if equipo.imagen %}data:image/png;base64,{{ equipo.imagen|b64encode }}{% else %}{{ url_for('static', filename='img/default_image.png') }}{% endif %}" 
+                            alt="Imagen del equipo">
+                        <div class="overlay-text">CJ {{ equipo.cj }}</div>
+                        <h1>{{ equipo.nombre_equipo }}</h1>
+                    </div>
                 {% endfor %}
             {% else %}
                 <p>No se encontraron equipos asignados a este sistema y buque.</p>
             {% endif %}
         </div>
+
     </div>
     
     
     <script src="{{ url_for('static', filename='js/desglose.js') }}"></script>
     <script src="{{ url_for('static', filename='js/global.js') }}"></script>
 
+    <script>
+        function redirectToLSA() {
+            window.location.href='{{ config.EXTERNAL_URL_1 }}/lsa/{{ buque_id }}';
+        }
+        function redirectToSistemas() {
+            window.location.href='{{ config.EXTERNAL_URL_1 }}/buques/{{ buque_id }}/sistemas';
+        }
+    </script>
     
 {% endblock %}

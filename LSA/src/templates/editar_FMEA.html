@@ -10,9 +10,6 @@
 {% endblock %}
 
 
-
-{% block nombre %}LSA | FMEA{% endblock %}
-
 {% block body %}
 <div class="container" id="reporte">
   <div class="row toolBar" style="position: sticky; top: 65px;">
@@ -22,13 +19,11 @@
     </div>
     <div class="col-5 pt-3" style="align-items: start; justify-content: end; display: flex; padding-right: 1.5rem;">
         <div class="buttons" style="display: flex; gap: 10px;">
-            <a href="{{ url_for('registro_FMEA',id_equipo_info=id_equipo_info) }}" 
-               class="btn btn-primary">Agregar modo de falla</a>
-               <a href="{{ url_for('editar_RCM_lista', id_equipo_info=id_equipo_info) }}" 
-               class="btn btn-primary">Ver RCM</a>
-            <a href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" 
-               class="btn btn-secondary">Cerrar modulo</a>
-        </div>                
+            <a href="{{ url_for('registro_FMEA', id_equipo_info=id_equipo_info) }}" class="btn btn-primary">Agregar modo de falla</a>
+            <a href="{{ url_for('editar_RCM_lista', id_equipo_info=id_equipo_info, from=from_url) }}" class="btn btn-primary">Ver RCM</a>
+            <a href="{% if from_url %}{{ from_url }}{% if '?' in from_url %}&from=fmea{% else %}?from=fmea{% endif %}{% else %}{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info) }}{% endif %}" 
+              class="btn btn-secondary">Cerrar módulo</a>
+        </div>               
     </div>
   </div>
   <div id="fade-container" style="top: 142px;"></div>

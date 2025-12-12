@@ -3,12 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const grupoConstructivo = document.getElementById('grupo_constructivo');
     const subgrupoConstructivo = document.getElementById('subgrupo_constructivo');
     const sistema = document.getElementById('sistema');
+    const subsistema = document.getElementById('subsistema');
     const equipo = document.getElementById('equipo');
     const tipoEquipo = document.getElementById('tipo_equipo');
     const addPersonalBtn = document.getElementById('add_personal');
     const deletePersonalBtn = document.getElementById('delete_personal');
     const responsable = document.getElementById('responsable');
-    
+    const codigoHidden = document.getElementById('codigo'); // <- hidden name="codigo"
 
     grupoConstructivo.addEventListener('change', () => {
         const grupoId = grupoConstructivo.value;
@@ -27,41 +28,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         sistema.innerHTML = '<option value="">Seleccione Sistema</option>';
         equipo.innerHTML = '<option value="">Seleccione Equipo</option>';
+        subsistema.innerHTML = '<option value="">Seleccione Subsistema</option>';
+        if (codigoHidden) codigoHidden.value = '';
     });
 
     subgrupoConstructivo.addEventListener('change', () => {
         const subgrupoId = subgrupoConstructivo.value;
+
+        // Reseteos iniciales
+        sistema.innerHTML = '<option value="">Seleccione Sistema</option>';
+        equipo.innerHTML = '<option value="">Seleccione Equipo</option>';
+        subsistema.innerHTML = '<option value="">Seleccione Subsistema</option>';
+        if (codigoHidden) codigoHidden.value = '';
+
         if (subgrupoId) {
             fetch(`/api/sistemas/${subgrupoId}`)
-                .then(response => response.json())
-                .then(data => {
-                    sistema.innerHTML = '<option value="">Seleccione Sistema</option>';
-                    data.forEach(sistemaItem => {
-                        sistema.innerHTML += `<option value="${sistemaItem.id}">${sistemaItem.nombre}</option>`;
-                    });
-                })
-                .catch(error => console.error('Error al obtener sistemas:', error));
-        } else {
-            sistema.innerHTML = '<option value="">Seleccione Sistema</option>';
+            .then(response => response.json())
+            .then(data => {
+                sistema.innerHTML = '<option value="">Seleccione Sistema</option>';
+                data.forEach(sistemaItem => {
+                    // "codigo - nombre" y guardamos el codigo en data-*
+                    const opt = document.createElement('option');
+                    opt.value = sistemaItem.id;
+                    opt.textContent = `${sistemaItem.numeracion} - ${sistemaItem.nombre}`;
+                    opt.dataset.codigo = sistemaItem.numeracion || '';
+                    sistema.appendChild(opt);
+                });
+            })
+            .catch(error => console.error('Error al obtener sistemas:', error));
         }
-        equipo.innerHTML = '<option value="">Seleccione Equipo</option>';
     });
 
-    // Cambio en sistema
     sistema.addEventListener('change', () => {
         const sistemaId = sistema.value;
+
+        // Actualiza hidden 'codigo' con el data-codigo del option seleccionado
+        const sel = sistema.options[sistema.selectedIndex];
+        if (codigoHidden) codigoHidden.value = sel?.dataset?.codigo || '';
+
+        // Cargar equipos
         if (sistemaId) {
             fetch(`/api/equipos/${sistemaId}`)
                 .then(response => response.json())
                 .then(data => {
                     equipo.innerHTML = '<option value="">Seleccione Equipo</option>';
                     data.forEach(equipoItem => {
-                        equipo.innerHTML += `<option value="${equipoItem.id}">${equipoItem.nombre}</option>`;
+                        equipo.innerHTML += `<option value="${equipoItem.id}">${equipoItem.numeracion} - ${equipoItem.nombre}</option>`;
                     });
                 })
                 .catch(error => console.error('Error al obtener equipos:', error));
+
+            // Cargar subsistemas relacionados
+            fetch(`/api/subsistemas/${sistemaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    subsistema.innerHTML = '<option value="">Seleccione Subsistema</option>';
+                    data.forEach(sub => {
+                        subsistema.innerHTML += `<option value="${sub.id}">${sub.numero_de_referencia} - ${sub.descripcion}</option>`;
+                    });
+                })
+                .catch(error => console.error('Error al obtener subsistemas:', error));
         } else {
             equipo.innerHTML = '<option value="">Seleccione Equipo</option>';
+            subsistema.innerHTML = '<option value="">Seleccione Subsistema</option>';
         }
     });
 
@@ -128,9 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Por favor, seleccione un personal para eliminar');
         }
     });
-});
 
-document.addEventListener('DOMContentLoaded', () => {
     // Verificar si el nombre del equipo ya existe
     const nombreEquipoInput = document.getElementById('nombre_equipo');
 
@@ -165,17 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
 
-document.addEventListener('DOMContentLoaded', () => {
-    const nombreEquipoInput = document.getElementById('nombre_equipo');
-    const grupoConstructivo = document.getElementById('grupo_constructivo');
-    const subgrupoConstructivo = document.getElementById('subgrupo_constructivo');
-    const sistema = document.getElementById('sistema');
-    const equipo = document.getElementById('equipo');
-    const tipoEquipo = document.getElementById('tipo_equipo');
     const fechaInput = document.getElementById('fecha');
-    const responsable = document.getElementById('responsable');
     const gresSistema = document.getElementById('gres_sistema');
     const fiabilidadEquipo = document.getElementById('fiabilidad_equipo');
     const criticidadEquipo = document.getElementById('criticidad_equipo');
@@ -191,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const diagramaCajaNegra = document.getElementById('diagrama_caja_negra');
     const diagramaCajaTransparente = document.getElementById('diagrama_caja_transparente');
     const submitBtn = document.getElementById('submitBtn'); // Botón para enviar el formulario
+    
 
     // Función de validación
     function validarFormulario() {
@@ -217,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sistema.focus();
             return false;
         }
-
+   /*
         if (!equipo.value) {
             mostrarAlerta('Debe seleccionar un equipo.');
             equipo.focus();
@@ -229,6 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tipoEquipo.focus();
             return false;
         }
+
+     
 
         if (!gresSistema.value.trim()) {
             mostrarAlerta('El campo GRES del sistema es obligatorio.');
@@ -313,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
             diagramaCajaTransparente.focus();
             return false;
         }
+        */
 
         // Si todo está lleno, devuelve verdadero
         return true;
@@ -341,6 +363,19 @@ document.addEventListener('DOMContentLoaded', () => {
             text: mensaje,
             confirmButtonText: 'OK'
         });
+    }
+
+    // Cargar automáticamente subsistemas si ya hay un sistema seleccionado
+    if (sistema.value) {
+        fetch(`/api/subsistemas/${sistema.value}`)
+            .then(response => response.json())
+            .then(data => {
+                subsistema.innerHTML = '<option value="">Seleccione Subsistema</option>';
+                data.forEach(sub => {
+                    subsistema.innerHTML += `<option value="${sub.id}">${sub.descripcion}</option>`;
+                });
+            })
+            .catch(error => console.error('Error al precargar subsistemas:', error));
     }
 
     // Manejar el envío del formulario

@@ -1,4 +1,4 @@
-{% extends 'base_navbar.html' %}
+{% extends '/base.html' %}
 
 {% block title %}Cotecmar || Editar Repuesto{% endblock %}
 
@@ -8,9 +8,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/repuesto.css') }}">
 {% endblock %}
 
-{% block nombre %}LSA | Editar Repuesto{% endblock %}
-
-{% block content %}
+{% block body %}
 
 <div class="col">
     <div id="hoja">
@@ -57,6 +55,9 @@
 
                 <div class="text-end mt-4">
                     <input type="hidden" id="id_equipo_info" name="id_equipo_info" value="{{ id_equipo_info}}">
+                    <button type="button" class="btn btn-danger" onclick="redirigirSegunURLAnterior()">
+                        Cancelar
+                    </button>
                     <button type="submit" class="btn btn-primary" id="btn-guardar-repuesto">Guardar cambios</button>
                 </div>
             </form>

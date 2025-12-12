@@ -71,7 +71,6 @@ body {
 
 .nav-link{
     color: #0c377f; /* Azul */
-    font-weight: bold;
     margin: 0;
 }
 
@@ -308,7 +307,7 @@ i{
     margin: 0;
     text-align: left;
     font-weight: bold;
-    color: #013882;
+    color: #003366;
     padding-left: 10px;
     line-height: 1.5;
     font-size: 20px;
@@ -344,4 +343,24 @@ i{
     background-color: #3FA35E;
     border-color: #3FA35E;
     padding: 8px;
+}
+
+table th, table td, #myTab button{
+    font-size: 14px;
+    color: #323336;
+}
+
+.tab-content{
+    border-top: 0;
+    border-right: 1px solid #DEE2E6;
+    border-left: 1px solid #DEE2E6;
+    border-bottom: 1px solid #DEE2E6;
+}
+
+.nav-link.active {
+    color: #0053A0 !important;
+}
+
+.table>:not(caption)>*>* {
+    color: #323336;
 }

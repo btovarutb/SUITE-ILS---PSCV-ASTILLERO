@@ -1,0 +1,364 @@
+{% extends './base.html' %}
+
+{% block custom %}
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/equipos_buque.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scroll.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Three.js para visor CAD 3D - Compatible con flaskapp (r128) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<!-- Fallback: GLTFExporter alternativo si el primero falla -->
+<script src="https://unpkg.com/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<!-- occt-import-js para soporte STEP/IGES completo con WebAssembly -->
+<script src="https://unpkg.com/occt-import-js/dist/occt-import-js.js"></script>
+<!-- CAD Preloader - Sistema de precarga y caché inteligente -->
+<script src="{{ url_for('static', filename='js/cad_preloader.js') }}?v=20250116"></script>
+<!-- CAD Viewer - Refactorizado basado en flaskapp -->
+<script src="{{ url_for('static', filename='js/cad_viewer.js') }}?v=20250116"></script>
+{% endblock %}
+
+{% block title %}
+  {% if from_param == 'analisis_lsa' %}
+    Análisis LSA – {{ nombre_buque }}
+  {% else %}
+    Gestión de Equipos – {{ nombre_buque }}
+  {% endif %}
+{% endblock %}
+
+
+{% block body %}
+
+
+<!-- ENCABEZADO -->
+<div class="equipos-header">
+  <div class="d-flex align-items-center">
+    <div class="mb-0">
+          <button 
+              onclick="{% if from_param == 'editar_buque' %}window.location.href='{{ config.EXTERNAL_URL_1 }}/buques/{{ buque_id }}/edit'{% else %}history.back(){% endif %}" 
+              class="volverBtn">
+              <i class="bi bi-chevron-left"></i>
+              Volver
+          </button>
+        </div>
+
+        <!-- Separador vertical -->
+        <div style="border-left: 2px solid #003366; height: 30px; margin: 0 12px;"></div>
+
+        {% if from_param == 'analisis_lsa' %}
+          <!-- Encabezado alterno para Análisis LSA -->
+          <div class="d-flex flex-row align-items-center ms-2">
+            <!-- Span LSA -->
+            <span class="fw-bold" style="color: rgb(33, 69, 169); font-size: 40px;">LSA</span>
+            <!-- Span frase -->
+            <span class="text-gray-600 leading-tight" 
+                  style="font-size: 14px; max-width: 140px; word-wrap: break-word; line-height: 1.3; padding-left: 4px">
+              análisis de apoyo logístico
+            </span>
+          </div>
+        {% else %}
+          <!-- Encabezado normal -->
+          <span class="titulo-equipos">GESTIÓN DE EQUIPOS</span>
+        {% endif %}
+    </div>
+
+    <!-- Separador vertical -->
+    <div style="border-left: 2px solid #003366; height: 30px;"></div>
+
+  <a href="{{ config.EXTERNAL_URL_1 }}/{{ buque_id }}/modulos" class="text-decoration-none text-dark">
+    <span class="nombre-buque">
+      <span class="text-lift">{{ nombre_buque }}</span>
+    </span>
+  </a>
+</div>
+
+
+
+<!-- CONTENEDOR PRINCIPAL -->
+<div id="desglose-container" class="flex gap-2 bg-white rounded shadow p-3">
+
+  <!-- BOTÓN DE EXPANDIR -->
+  <div id="fullscreen-btn-wrapper">
+    <button id="toggle-fullscreen" class="btn btn-sm" title="Expandir vista">
+      <i class="bi bi-arrows-fullscreen"></i>
+    </button>
+  </div>
+
+  <!-- GRUPOS -->
+  <div id="grupos-container" class="grupos-expanded-inicial">
+    <h3 class="titulo-col">Grupos Constructivos</h3>
+    <div id="grupos-list" class="space-y-2"></div>
+  </div>
+    <!-- TOGGLE BARRA -->
+    <div id="toggle-bar" class="hide" onclick="toggleGrupos()">
+      <i id="chevron-icon" class="bi bi-chevron-left"></i>
+      <span id="toggle-label" class="rotated-label">GRUPOS</span>
+    </div>    
+
+  <!-- EQUIPOS -->
+  <div id="equipos-container" class="equipos-expanded-inicial">
+    <h3 class="titulo-col">Equipos</h3>
+    <div id="equipos-content">
+
+      <!-- FILTRO SISTEMA + BUSCADOR -->
+      <div id="filtro-sistemas-container" class="hidden row">
+        <div class="col-6 relative floating-group" style="padding-right: 5px;">
+          <select id="filtro-sistemas" class="floating-input peer">
+            <option value="">Todos los sistemas</option>
+          </select>
+          <label for="filtro-sistemas" class="floating-label">Filtrar por sistema</label>
+        </div>
+
+        <div class="col-6 relative floating-group" style="padding-left: 5px;">
+          <input type="text" id="buscar-equipo" class="floating-input peer" />
+          <label for="buscar-equipo" class="floating-label">Buscar equipo</label>
+        </div>
+
+        <div class="d-grid mx-auto mt-2" >
+          <!-- Botón para crear un nuevo equipo -->
+          <button id="btn-nuevo-equipo" style="font-size: 14px" class="btn btn-secondary p-1">+ Nuevo equipo</button>
+        </div>
+      </div>
+
+      <!-- LISTA DE EQUIPOS -->
+      <div id="list-group-equipos" class="list-group-equipos flex flex-col gap-2">
+        <div class="no-equipos-msg text-center text-gray-500">Seleccione un grupo constructivo.</div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Contenedor derecho para mostrar los detalles del equipo seleccionado -->
+    <div id="detalle-equipo-container" class="detalle-mostrando d-none">
+        <!-- Aquí se inyectará dinámicamente el HTML del equipo -->
+    </div>
+
+    <!-- Modal de Imagen -->
+    <div class="modal fade" id="modalImagen" tabindex="-1" aria-labelledby="modalImagenLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h3 class="modal-title">Patrón de Falla</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+            <img id="imagenModal" src="" class="img-fluid" alt="Imagen no disponible">
+            </div>
+        </div>
+      </div>
+    </div>
+
+<div id="modalConfiguracionPDF" class="modal modal-exportables" style="display:none;">
+  <div class="modal-content shadow-lg position-relative">
+    <!-- Botón de cierre -->
+    <button id="cerrarModalPDF" class="btn btn-cerrar-modal" title="Cerrar">✕</button>
+
+    <!-- Encabezado -->
+    <div class="modal-header-exportables">
+      <div class="title-wrap">
+        <h4 class="mb-0">Exportables</h4>
+        <p class="subtitulo mb-0">Genera informes en PDF o descarga Excel con tus datos</p>
+      </div>
+      <div class="badge-wrap">
+        <span class="badge-soft">LSA</span>
+      </div>
+    </div>
+
+    {% if from_param == 'analisis_lsa' %}
+      <!-- SOLO mostrar Informe LSA (checklist NO cambia) -->
+      <div class="tab-content">
+        <section id="tab-pdf" class="tab-panel active">
+          <div class="grid-two">
+            <!-- Card: Informe LSA -->
+            <article class="cardx">
+              <header class="cardx-header">
+                <div class="icon-circle">
+                  <i class="bi bi-filetype-pdf"></i>
+                </div>
+                <div>
+                  <h3 class="cardx-title">Informe de LSA</h3>
+                  <p class="cardx-desc">Selecciona las secciones que deseas incluir en el informe.</p>
+                </div>
+              </header>
+
+              <!-- Checklist de secciones (mismas en ambos casos) -->
+              <form id="formConfiguracionPDF" class="form-secciones">
+                <div class="checkbox-list">
+                  <label><input type="checkbox" name="secciones" value="section1" checked> 1. Generalidades</label>
+                  <label><input type="checkbox" name="secciones" value="section2" checked> 2. Detalles del Equipo</label>
+                  <label><input type="checkbox" name="secciones" value="section3" checked> 3. Procedimientos</label>
+                  <label><input type="checkbox" name="secciones" value="section4" checked> 4. Esquemáticos</label>
+                  <label><input type="checkbox" name="secciones" value="section5" checked> 5. Fiabilidad</label>
+                  <label><input type="checkbox" name="secciones" value="section6" checked> 6. Análisis Funcional</label>
+                  <label><input type="checkbox" name="secciones" value="section7" checked> 7. Herramientas</label>
+                  <label><input type="checkbox" name="secciones" value="section8" checked> 8. Repuestos</label>
+                  <label><input type="checkbox" name="secciones" value="section9" checked> 9. FMEA</label>
+                  <label><input type="checkbox" name="secciones" value="section10" checked> 10. RCM</label>
+                  <label><input type="checkbox" name="secciones" value="section11" checked> 11. MTA</label>
+                </div>
+
+                <div class="btn-row">
+                  <button type="button" id="visualizarPDF" class="btn-generar-pdf btn-ghost">
+                    <i class="bi bi-eye"></i> Visualizar PDF
+                  </button>
+                  <button type="button" id="confirmarGeneracionPDF" class="btn-generar-pdf">
+                    <i class="bi bi-download"></i> Generar PDF
+                  </button>
+                </div>
+              </form>
+            </article>
+          </div>
+        </section>
+      </div>
+    {% else %}
+      <!-- Versión completa (Equipos) -->
+      <!-- Tabs -->
+      <div class="tabs-exportables">
+        <button class="tab-btn active" data-tab="tab-pdf">
+          <i class="bi bi-filetype-pdf"></i> PDF
+        </button>
+        <button class="tab-btn" data-tab="tab-excel">
+          <i class="bi bi-file-earmark-excel"></i> Excel
+        </button>
+      </div>
+
+      <!-- Contenido -->
+      <div class="tab-content">
+
+        <!-- ========= TAB PDF ========= -->
+        <section id="tab-pdf" class="tab-panel active">
+          <div class="grid-two">
+            <!-- Card: Informe LSA -->
+            <article class="cardx">
+              <header class="cardx-header">
+                <div class="icon-circle">
+                  <i class="bi bi-filetype-pdf"></i>
+                </div>
+                <div>
+                  <h3 class="cardx-title">Informe de LSA</h3>
+                  <p class="cardx-desc">Selecciona las secciones que deseas incluir en el informe.</p>
+                </div>
+              </header>
+
+              <!-- Checklist de secciones (mismas en ambos casos) -->
+              <form id="formConfiguracionPDF" class="form-secciones">
+                <div class="checkbox-list">
+                  <label><input type="checkbox" name="secciones" value="section1" checked> 1. Generalidades</label>
+                  <label><input type="checkbox" name="secciones" value="section2" checked> 2. Detalles del Equipo</label>
+                  <label><input type="checkbox" name="secciones" value="section3" checked> 3. Procedimientos</label>
+                  <label><input type="checkbox" name="secciones" value="section4" checked> 4. Esquemáticos</label>
+                  <label><input type="checkbox" name="secciones" value="section5" checked> 5. Fiabilidad</label>
+                  <label><input type="checkbox" name="secciones" value="section6" checked> 6. Análisis Funcional</label>
+                  <label><input type="checkbox" name="secciones" value="section7" checked> 7. Herramientas</label>
+                  <label><input type="checkbox" name="secciones" value="section8" checked> 8. Repuestos</label>
+                  <label><input type="checkbox" name="secciones" value="section9" checked> 9. FMEA</label>
+                  <label><input type="checkbox" name="secciones" value="section10" checked> 10. RCM</label>
+                  <label><input type="checkbox" name="secciones" value="section11" checked> 11. MTA</label>
+                </div>
+
+                <div class="btn-row">
+                  <button type="button" id="visualizarPDF" class="btn-generar-pdf btn-ghost">
+                    <i class="bi bi-eye"></i> Visualizar PDF
+                  </button>
+                  <button type="button" id="confirmarGeneracionPDF" class="btn-generar-pdf">
+                    <i class="bi bi-download"></i> Generar PDF
+                  </button>
+                </div>
+              </form>
+            </article>
+
+            <!-- Card: Tarjeta de índice de maquinaria -->
+            <article class="cardx">
+              <header class="cardx-header">
+                <div class="icon-circle">
+                  <i class="bi bi-filetype-pdf"></i>
+                </div>
+                <div>
+                  <h3 class="cardx-title">Tarjeta de Índice de Maquinaria</h3>
+                  <p class="cardx-desc">Próximamente podrás generar este PDF desde aquí.</p>
+                </div>
+              </header>
+
+              <div class="btn-row">
+                <button type="button" class="btn-disabled" id="btnTarjetaIndice" disabled>
+                  <i class="bi bi-hourglass-split"></i> Próximamente
+                </button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- ========= TAB EXCEL ========= -->
+        <section id="tab-excel" class="tab-panel">
+          <div class="grid-two">
+            <!-- Card: Equipos y características -->
+            <article class="cardx">
+              <header class="cardx-header">
+                <div class="icon-circle">
+                  <i class="bi bi-file-earmark-excel"></i>
+                </div>
+                <div>
+                  <h3 class="cardx-title">Equipos y características</h3>
+                  <p class="cardx-desc">Descarga un Excel con la lista de equipos y sus atributos clave.</p>
+                </div>
+              </header>
+              <div class="btn-row">
+                <button type="button" class="btn-excel" id="btnExcelEquipos">
+                  <i class="bi bi-file-earmark-excel"></i> Generar Excel
+                </button>
+              </div>
+            </article>
+
+            <!-- Card: Ubicación técnica -->
+            <article class="cardx">
+              <header class="cardx-header">
+                <div class="icon-circle">
+                  <i class="bi bi-file-earmark-excel"></i>
+                </div>
+                <div>
+                  <h3 class="cardx-title">Ubicación técnica</h3>
+                  <p class="cardx-desc">Exporta la estructura de ubicación técnica para integración y control.</p>
+                </div>
+              </header>
+              <div class="btn-row">
+                <button type="button" class="btn-excel" id="btnExcelUbicacion">
+                  <i class="bi bi-file-earmark-excel"></i> Generar Excel
+                </button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+
+
+
+</div>
+
+<!-- Variables disponibles para el JS -->
+<script>
+  window.buqueId = {{ buque_id }};
+  window.nombreBuque = "{{ nombre_buque|urlencode }}";
+  window.equiposGlobal = {{ equipos | tojson | safe }};
+  console.log("🚩 autoseleccionarEquipo:", {{ autoseleccionar_equipo | tojson }});
+  window.autoseleccionarEquipo = {{ autoseleccionar_equipo | tojson }};
+  window.allowedTabs = {{ (allowed_tabs or []) | tojson | safe }}; 
+</script>
+
+<!-- Scripts -->
+<script src="{{ url_for('static', filename='js/global.js') }}"></script>
+<script src="{{ url_for('static', filename='js/equipos_buque.js') }}"></script>
+<script src="{{ url_for('static', filename='js/informe.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="{{ url_for('static', filename='js/pdfmake-custom-inter.js') }}"></script>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+{% endblock %}

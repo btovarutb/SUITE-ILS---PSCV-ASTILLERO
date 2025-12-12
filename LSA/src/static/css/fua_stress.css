@@ -5,9 +5,9 @@ body {
 }
 
 .volverBtn {
-    width: 33px;
+    width: 40px;
     height: 33px;
-    background-color: #013882;
+    background-color: #003366;
     padding: 0;
     border-radius: 50px;
     border: 0;
@@ -29,10 +29,10 @@ body {
 #navigation-info p {
     margin: 0;
     padding-left: 8px;
-    border-left: 2px solid #013882;
+    border-left: 2px solid #003366;
     margin-left: 8px;
     font-weight: bold;
-    color: #013882;
+    color: #003366;
 }
 
 .list-group {

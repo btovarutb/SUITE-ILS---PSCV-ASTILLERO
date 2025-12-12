@@ -71,10 +71,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const formEspeciales = document.getElementById('herramientas-especiales-form');
 
     formEspeciales.addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevenir comportamiento predeterminado del formulario
-
+        e.preventDefault(); // prevenir
+    
         const formData = new FormData(formEspeciales);
-
+    
+        // 👇 AÑADIR ID EXPLÍCITAMENTE
+        const idEquipoInput = document.querySelector('input[name="id_equipo_info"]');
+        if (idEquipoInput) {
+            formData.append('id_equipo_info', idEquipoInput.value);
+        }
+    
         fetch('/api/herramientas-especiales', {
             method: 'POST',
             body: formData
@@ -88,21 +94,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(result => {
-            // Mostrar mensaje de éxito con SweetAlert
             Swal.fire({
                 icon: 'success',
                 title: '¡Éxito!',
-                text: result.message, // Mensaje devuelto por el servidor
+                text: result.message,
             }).then(() => {
-                // Limpiar el formulario después de enviar la información
                 limpiarFormulario(formEspeciales);
-
-                // Redirigir o actualizar la página si es necesario
-                // window.location.reload(); // Descomentar si se desea recargar la página
             });
         })
         .catch(error => {
-            // Mostrar mensaje de error con SweetAlert
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error al guardar herramientas especiales:', error);
         });
     });
+    
     
     const btnVisualizar = document.querySelector('.btn-visualizar-herramientas');
     if (btnVisualizar) {

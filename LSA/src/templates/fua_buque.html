@@ -1,0 +1,207 @@
+{% extends './base.html' %}
+
+{%block custom%}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fua_buque.css') }}">
+{%endblock%}
+
+{% block title %}LSA{% endblock %}
+
+{% block body %}
+
+<div class="fua-header">
+
+    <a href="{{ config.EXTERNAL_URL_1 }}/buques/{{ buque_id }}/mod_fua" class="text-decoration-none text-dark">
+      <div class="d-flex align-items-center text-lift">
+        <span class="titulo-fua">FUA</span>
+        <span class="label-fua">Factor de utilización anual</span>
+      </div>
+    </a>
+  
+    <a href="{{ config.EXTERNAL_URL_1 }}/{{ buque_id }}/modulos" class="text-decoration-none text-dark">
+      <span class="nombre-buque">
+        <span class="text-lift">{{ nombre_buque }}</span> <!-- ✅ Solo el texto se levanta -->
+      </span>
+    </a>
+  
+    <span class="nombre-buque">Cálculo de AOR para equipos</span>
+  
+  </div>
+  
+  
+  
+  
+
+<div id="desglose-container" class="flex gap-2 p-3 bg-white rounded shadow">
+
+    <div id="grupos-container" class="grupos-expanded-inicial">
+        <h3 class="titulo-col">Grupos Constructivos</h3>
+        <div id="grupos-list" class="space-y-2"></div>
+    </div>
+
+    <div id="toggle-bar" class="hide" onclick="toggleGrupos()">
+        <i id="chevron-icon" class="bi bi-chevron-left"></i>
+        <span class="rotated-label">GRUPOS</span>
+    </div>
+
+    <div id="equipos-container" class="equipos-expanded-inicial">
+        <h3 class="titulo-col">Equipos</h3>
+        <div id="equipos-content">
+            <div id="filtro-sistemas-container" class="hidden row">
+                <div class="col-6 relative floating-group">
+                    <select id="filtro-sistemas" class="floating-input peer">
+                        <option value="">Todos los sistemas</option>
+                    </select>
+                    <label for="filtro-sistemas" class="floating-label">Filtrar por sistema</label>
+                </div>
+                <div class="col-6 relative floating-group">
+                    <input type="text" id="buscar-equipo" class="floating-input peer" />
+                    <label for="buscar-equipo" class="floating-label">Buscar equipo</label>
+                </div>
+            </div>
+
+            <div id="list-group-equipos" class="list-group-equipos flex flex-col gap-2">
+                <div class="no-equipos-msg text-center text-gray-500">Seleccione un grupo constructivo.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detalle-equipo-container" class="d-none">
+        <h3 class="titulo-col">Detalles del equipo seleccionado</h3>
+        <div id="detalle-equipo" class="text-gray-700 space-y-2">
+            <div id="contenedor-fua-fr">
+                <!-- Panel dinámico FUA/FR -->
+                <div id="NavTools" class="row mb-3">
+                    <div class="buttons p-0">
+                        <button class="tab-button btn active" data-target="section1">Factor de utilización anual (FUA)</button>
+                        <button class="tab-button btn" data-target="section2">Factor de rendimiento (FR)</button>
+                    </div>
+                    <div id="EditionButton" style="width: 50px; display: flex; padding: 0; gap: 10px; justify-content: flex-end;">
+                        <button id="btn-editar" class="btn" onclick="toggler()">
+                            <i id="icono-editar" class="bi bi-pencil"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="content">
+                    <div id="section1" class="zone section active">
+                        <p class="subtitulo mb-1">Puerto base</p>
+                        <div id="campos-estaticos-fua">
+                            {% for campo in campos_estaticos %}
+                            <div class="row mb-2 ml-1">
+                                <div class="col-md-5">
+                                    <label class="form-label" for="{{ campo.id }}">{{ campo.label }}</label>
+                                </div>
+                                <div class="col-md-2 withUnid">
+                                    <input type="number" class="form-control" id="{{ campo.id }}" readonly>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="col-md-5">
+                                    <textarea class="form-control" id="descripcion-{{ campo.id }}" readonly rows="2"></textarea>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <p class="subtitulo pt-4 mb-1">Puerto Extranjero</p>
+                        <div id="campos-misiones-fua">
+                            {% for mision in misiones %}
+                            <div class="row mb-2">
+                                <div class="col-md-5">
+                                    <label class="form-label" for="{{ mision.normalized_id }}">{{ mision.mision }}</label>
+                                </div>
+                                <div class="col-md-2 withUnid">
+                                    <input type="number" class="form-control" id="{{ mision.normalized_id }}" readonly>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="col-md-5">
+                                    <textarea class="form-control" id="descripcion-{{ mision.normalized_id }}" readonly rows="2"></textarea>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="row mt-3 mb-3">
+                            <div class="col-md-12">
+                                <p class="subtitulo mb-1">Resultados FUA</p>
+                                <div class="row">
+                                    <div class="col-6 d-flex justify-content-around align-items-center">
+                                        <p class="m-0">AOR:</p>
+                                        <div class="withUnid" style="width: 50%">
+                                            <input type="text" class="form-control" id="resultado-fua" readonly placeholder="0.00">
+                                            <span class="input-group-text">horas</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 d-flex justify-content-around align-items-center">
+                                        <p class="m-0">AOR Porcentual:</p>
+                                        <div class="withUnid" style="width: 50%">
+                                            <input type="text" class="form-control" id="resultado-fua-porcentaje" readonly placeholder="0.00">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="section2" class="zone section">
+                        <div id="campos-estaticos-fr">
+                            {% for campo in campos_estaticos %}
+                            <div class="row mb-2 ml-1">
+                                <div class="col-md-5">
+                                    <label class="form-label" for="fr-{{ campo.id }}">{{ campo.label }}</label>
+                                </div>
+                                <div class="col-md-2 withUnid">
+                                    <input type="number" class="form-control" id="fr-{{ campo.id }}" readonly>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="col-md-5">
+                                    <textarea class="form-control" id="descripcion-fr-{{ campo.id }}" readonly rows="2"></textarea>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="campos-misiones-fr">
+                            {% for mision in misiones %}
+                            <div class="row mb-2">
+                                <div class="col-md-5">
+                                    <label class="form-label" for="fr-{{ mision.normalized_id }}">{{ mision.mision }}</label>
+                                </div>
+                                <div class="col-md-2 withUnid">
+                                    <input type="number" class="form-control" id="fr-{{ mision.normalized_id }}" readonly>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="col-md-5">
+                                    <textarea class="form-control" id="descripcion-fr-{{ mision.normalized_id }}" readonly rows="2"></textarea>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-none flex-row-reverse espacioGuardado" style="padding: 1.2rem;">
+                        <button id="btn-guardar" type="button" class="btn"
+                            style="background-color: #003366; color: white;"
+                            onclick="guardarFuaFr()">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Datos disponibles para JS -->
+<script>
+    window.buqueId = {{ buque_id }};
+    window.equiposGlobal = {{ equipos | tojson | safe }};
+    window.camposEstaticos = {{ campos_estaticos | tojson | safe }};
+    window.misiones = {{ misiones | tojson | safe }};
+    window.datosPuertoBase = {{ datosPuertoBase | tojson | safe }};
+    window.equipoPreseleccionadoId = {{ equipo_seleccionado.id if equipo_seleccionado else 'null' }};
+    window.sistemasGlobal = {{ sistemas | tojson | safe }}; <!-- 🔥 Nuevo -->
+</script>
+
+<script src="{{ url_for('static', filename='js/fua_buque.js') }}"></script>
+<script src="{{ url_for('static', filename='js/global.js') }}"></script>
+
+{% endblock %}

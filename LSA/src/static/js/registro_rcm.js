@@ -34,8 +34,12 @@ document.addEventListener('DOMContentLoaded', function() {
             h3s3: document.getElementById('h3s3').value,
             h4s4: document.getElementById('h4s4').value,
             h5: document.getElementById('h5').value,
-            tarea: document.getElementById('tarea').value
+            tarea: document.getElementById('tarea').value,
+            patron_de_falla: document.getElementById('patron_de_falla').value,  // Imagen Base64
+            tarea_contemplada: document.getElementById('tarea_contemplada').value,
+            fuente: document.getElementById('fuente').value
         };
+        
 
         // Enviar los datos mediante fetch
         fetch('/api/rcm', {
@@ -81,4 +85,20 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const imagenInput = document.getElementById('imagen_patron');
+    const hiddenInput = document.getElementById('patron_de_falla');
+
+    imagenInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function() {
+                hiddenInput.value = reader.result;  // Guardar imagen en Base64 en campo oculto
+            };
+        }
+    });
 });

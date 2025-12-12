@@ -159,8 +159,8 @@ body {
     margin: 0;
     text-align: left;
     font-weight: bold;
-    color: #013882;
-    border-left: 3px solid #013882; /* Color y grosor de la línea */
+    color: #003366;
+    border-left: 3px solid #003366; /* Color y grosor de la línea */
     padding-left: 10px; /* Espacio entre la línea y el texto */
     line-height: 1.5; /* Ajusta el espaciado de línea */
     margin-left: 20px;
@@ -180,7 +180,7 @@ body {
 }
 
 .volverBtn, .volverBtn i{
-    color: #013882;
+    color: #003366;
     font-size: 18px;
 }
 

@@ -8,10 +8,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/FMEA.css') }}">
 {% endblock %}
 
-
-
-{% block nombre %}LSA | RCM{% endblock %}
-
 {% block body %}
 
     <div class="container" id="reporte">
@@ -22,11 +18,10 @@
             </div>
             <div class="col-4 pt-3" style="align-items: start; justify-content: end; display: flex; padding-right: 1.5rem;">
                 <div class="buttons" style="display: flex; gap: 10px;">
-                    <a href="{{ url_for('editar_MTA_lista',id_equipo_info=id_equipo_info) }}" 
-                       class="btn btn-primary">Ver MTA</a>
-                    <a href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" 
-                       class="btn btn-secondary">Cerrar RCM</a>
-                </div>                
+                    <a href="{{ url_for('editar_MTA_lista', id_equipo_info=id_equipo_info, from=from_url) }}" class="btn btn-primary">Ver MTA</a>
+                    <a href="{% if from_url %}{{ from_url }}{% if '?' in from_url %}&from=rcm{% else %}?from=rcm{% endif %}{% else %}{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info) }}{% endif %}" 
+                       class="btn btn-secondary">Cerrar RCM</a>                    
+                </div>                              
             </div>
         </div>
         <div id="fade-container"></div>
@@ -38,25 +33,39 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
+                                <!--
                                 <th scope="col">Subsistema</th>
                                 <th scope="col">Falla Funcional</th>
                                 <th scope="col">Item o componente</th>
-                                <th scope="col">Codigo Modo de Falla</th>
+                                <th scope="col">Código Modo de Falla</th>
                                 <th scope="col">Consecutivo de Modo de Falla</th>
                                 <th scope="col">Descripción Modo de Falla</th>
                                 <th scope="col">Causas</th>
-                                <th scope="col">Hidden Failures</th>
-                                <th scope="col">Safety</th>
-                                <th scope="col">Environment</th>
-                                <th scope="col">Operation</th>
-                                <th scope="col">H1/S1/N1/O1</th>
-                                <th scope="col">H2/S2/N2/O2</th>
-                                <th scope="col">H3/S3/N3/O3</th>
-                                <th scope="col">H4/S4/</th>
-                                <th scope="col">H5</th>
-                                <th scope="col">Tarea</th>
-                                <th scope="col">Accion Recomendada</th>
-                                <th scope="col">Intervalo Inicial</th>
+                                -->
+                                <th>No. Función (F)</th>
+                                <th>Falla funcional (FF)</th>
+                                <th>No. Modo de falla (MF)</th>
+                                <th>No. efecto de falla (EF)</th>
+                                <th>Hidden Failures</th>
+                                <th>Safety</th>
+                                <th>Environment</th>
+                                <th>Operation</th>
+                                <th>H1/S1/N1/O1</th>
+                                <th>H2/S2/N2/O2</th>
+                                <th>H3/S3/N3/O3</th>
+                                <th>H4/S4</th>
+                                <th>H5</th>
+                                <th>Patrón de falla</th>
+                                <th>Tarea Propuesta</th>
+                                <th>Frecuencia</th>
+                                <th>A Realizar por LORA</th>
+                                <th>Severidad</th>
+                                <th>Ocurrencia</th>
+                                <th>Detección</th>
+                                <th>NPRR</th>
+                                <th>Riesgo</th>
+                                <th>Tarea contemplada en plan de mantenimiento actual</th>
+                                <th>Fuente</th>
                                 <th colspan="3">Acciones</th>
                             </tr>
                         </thead>
@@ -64,6 +73,7 @@
                             {% for rcm in rcms %}
                                 <tr>
                                     <td>{{ loop.index }}</td>
+                                    <!--
                                     <td>{{ rcm['sistema'] }}</td>
                                     <td>{{ rcm['falla_funcional'] }}</td>
                                     <td>{{ rcm['componente'] }}</td>
@@ -71,40 +81,70 @@
                                     <td>{{ rcm['consecutivo_modo_falla'] }}</td>
                                     <td>{{ rcm['descripcion_modo_falla'] }}</td>
                                     <td>{{ rcm['causa'] }}</td>
+                                    -->
+                                    <td>{{ rcm['no_funcion'] }}</td>
+                                    <td>{{ rcm['falla_funcional'] }}</td>
+                                    <td>{{ rcm['no_modo_falla'] }}</td>
+                                    <td>{{ rcm['no_efecto_falla'] }}</td>
                                     <td>{{ rcm['hidden_failures'] }}</td>
                                     <td>{{ rcm['safety'] }}</td>
                                     <td>{{ rcm['environment'] }}</td>
                                     <td>{{ rcm['operation'] }}</td>
                                     <td>{{ rcm['h1_s1_n1_o1'] }}</td>
                                     <td>{{ rcm['h2_s2_n2_o2'] }}</td>
-                                    <td>{{ rcm['h3_s3_n3_o'] }}</td>
+                                    <td>{{ rcm['h3_s3_n3_o3'] }}</td>
                                     <td>{{ rcm['h4_s4'] }}</td>
                                     <td>{{ rcm['h5'] }}</td>
-                                    <td>{{ rcm['tarea'] }}</td>
-                                    <td>{{ rcm['accion_recomendada'] }}</td>
-                                    <td>{{ rcm['intervalo_inicial_horas'] }}</td>
                                     <td>
-                                        <button class="btn btn-warning btn-editar-rcm " data-bs-toggle="tooltip" data-bs-placement="top"
+                                        {% if rcm['patron_de_falla'] %}
+                                            <a href="#" class="open-modal" data-bs-toggle="modal" data-bs-target="#modalImagen" style="color: #003366"
+                                               data-img="{{ rcm['patron_de_falla'] }}">
+                                                Abrir Imagen
+                                            </a>
+                                        {% else %}
+                                            No disponible
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ rcm['tarea'] }}</td>
+                                    <td>{{ rcm['intervalo_inicial_horas'] }}</td>
+                                    <td>{{ rcm['actividades'] }}</td>
+                                    <td>{{ rcm['calculo_severidad'] }}</td>
+                                    <td>{{ rcm['ocurrencia_mate'] }}</td>
+                                    <td>{{ rcm['probabilidad_deteccion'] }}</td>
+                                    <td>{{ rcm['rpn'] }}</td>
+                                    <td>{{ rcm['riesgo'] }}</td>
+                                    <td>{{ rcm['tarea_contemplada'] }}</td>
+                                    <td>{{ rcm['fuente'] }}</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-editar-rcm" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="Editar RCM">
-                                            <a href="{{ url_for('editar_RCM', fmea_id=rcm['id_fmea'],id_equipo_info=id_equipo_info) }}" class="btn-editar-rcm"> RCM<i class="bi bi-pencil FMEA-edit"></i></a>
+                                            <a href="{{ url_for('editar_RCM', fmea_id=rcm['id_fmea'], id_equipo_info=id_equipo_info) }}" class="btn-editar-rcm">
+                                                RCM <i class="bi bi-pencil FMEA-edit"></i>
+                                            </a>
                                         </button>
                                     </td>
                                     <td>
                                         <button class="btn btn-danger mta" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="Eliminar RCM">
-                                            <a href="{{ url_for('eliminar_RCM', fmea_id=rcm['id_fmea'],id_rcm=rcm['id'],id_equipo_info=id_equipo_info) }}">RCM<i class="bi bi-trash FMEA-edit"></i></a>
+                                            <a href="{{ url_for('eliminar_RCM', fmea_id=rcm['id_fmea'], id_rcm=rcm['id'], id_equipo_info=id_equipo_info) }}">
+                                                RCM <i class="bi bi-trash FMEA-edit"></i>
+                                            </a>
                                         </button>
                                     </td>
                                     <td>
                                         {% if rcm['id'] in rcms_con_mta %}
                                             <button class="btn btn-warning btn-editar-mta" data-bs-toggle="tooltip" data-bs-placement="top"
                                                     title="Editar MTA">
-                                                <a href="{{ url_for('editar_MTA', rcm_id=rcm['id'],id_equipo_info=id_equipo_info) }}"> MTA <i class="bi bi-pencil FMEA-edit"></i></a>
+                                                <a href="{{ url_for('editar_MTA', rcm_id=rcm['id'], id_equipo_info=id_equipo_info) }}">
+                                                    MTA <i class="bi bi-pencil FMEA-edit"></i>
+                                                </a>
                                             </button>
                                         {% else %}
                                             <button class="btn btn-success btn-crear-mta" data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="Crear RCM">
-                                                <a href="{{ url_for('registro_MTA',id_equipo_info=id_equipo_info, fmea_id=rcm['id_fmea']) }}"> MTA <i class="bi bi-plus-circle FMEA-edit"></i></a>
+                                                    title="Crear MTA">
+                                                <a href="{{ url_for('registro_MTA', id_equipo_info=id_equipo_info, fmea_id=rcm['id_fmea']) }}">
+                                                    MTA <i class="bi bi-plus-circle FMEA-edit"></i>
+                                                </a>
                                             </button>
                                         {% endif %}
                                     </td>
@@ -112,15 +152,48 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    
                 </div>
                 <button class="scroll-button right" id="scroll-right">▶</button>
             </div>
         </div>
+        
+      <!-- Modal para mostrar la imagen -->
+        <div class="modal fade" id="modalImagen" tabindex="-1" aria-labelledby="modalImagenLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalImagenLabel">Patrón de Falla</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="imagenModal" src="" class="img-fluid" alt="Imagen no disponible">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
     
 <script src="{{ url_for('static', filename='js/editar_RCM.js') }}"></script>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleccionar todos los enlaces con la clase "open-modal"
+        document.querySelectorAll('.open-modal').forEach(link => {
+            link.addEventListener('click', function() {
+                // Obtener el valor de la imagen Base64
+                const imagenBase64 = this.getAttribute('data-img');
+                
+                // Verificar si hay un valor válido y actualizar el src del modal
+                if (imagenBase64) {
+                    document.getElementById('imagenModal').setAttribute('src', imagenBase64);
+                } else {
+                    document.getElementById('imagenModal').setAttribute('src', '');
+                }
+            });
+        });
+    });
+  </script>
+  
 
 <style>
     .scroll-container-horizontal {

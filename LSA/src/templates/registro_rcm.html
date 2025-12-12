@@ -8,8 +8,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/registro_rcm.css') }}">
 {% endblock %}
 
-{% block nombre %}LSA | Registro del RCM{% endblock %}
-
 {% block body %}
 
 <div class="col" style="margin-left: 30px;">
@@ -93,6 +91,10 @@
 
                         <label for="tarea" class="form-label mt-3">Tarea</label>
                         <input type="text" class="form-control gray-input" id="cuestionario_rcm10" name="tarea" placeholder="Tarea">
+                    
+                        <label for="patron_de_falla" class="form-label mt-3">Patrón de Falla</label>
+                        <input type="file" class="form-control" id="imagen_patron" accept="image/*">
+                        <input type="hidden" id="patron_de_falla" name="patron_de_falla"> <!-- Campo oculto para almacenar Base64 -->
                     </div>
                     <div class="col-md-4">
                         <label for="safety" class="form-label mt-3">Safety</label>
@@ -110,6 +112,9 @@
                                 <option value="{{ accion.id }}">{{ accion.nombre }}</option>
                             {% endfor %}
                         </select>
+
+                        <label for="tarea_contemplada" class="form-label mt-3">Tarea Contemplada</label>
+                        <textarea class="form-control" id="tarea_contemplada" name="tarea_contemplada" rows="2" placeholder="Describe la tarea contemplada">{{ rcm['tarea_contemplada'] }}</textarea>
                     </div>
                     <div class="col-md-4">
                         <label for="environment" class="form-label mt-3">Environment</label>
@@ -124,6 +129,8 @@
                         <label for="intervalo_inicial" class="form-label mt-3">Intervalo Inicial (en horas)</label>
                         <input type="number" class="form-control" id="intervalo_inicial" name="intervalo_inicial" placeholder="Intervalo Inicial">
 
+                        <label for="fuente" class="form-label mt-3">Fuente</label>
+                        <input type="text" class="form-control" id="fuente" name="fuente" placeholder="Fuente de la información" value="{{ rcm['fuente'] }}">
                      </div>
 
                 </div>
@@ -207,6 +214,10 @@
 
                         <label for="tarea" class="form-label mt-3">Tarea</label>
                         <input type="text" class="form-control gray-input" id="cuestionario_rcm10" name="tarea" placeholder="Tarea" value="{{ rcm['tarea'] or '' }}">
+                    
+                        <label for="patron_de_falla" class="form-label mt-3">Patrón de Falla</label>
+                        <input type="file" class="form-control" id="imagen_patron" accept="image/*">
+                        <input type="hidden" id="patron_de_falla" name="patron_de_falla"> <!-- Campo oculto para almacenar Base64 -->
                     </div>
                     <div class="col-md-4">
                         <label for="safety" class="form-label mt-3">Safety</label>
@@ -224,6 +235,9 @@
                                 <option value="{{ accion.id }}" {% if rcm['id_accion_recomendada'] == accion.id %}selected{% endif %}>{{ accion.nombre }}</option>
                             {% endfor %}
                         </select>
+
+                        <label for="tarea_contemplada" class="form-label mt-3">Tarea Contemplada</label>
+                        <textarea class="form-control" id="tarea_contemplada" name="tarea_contemplada" rows="2" placeholder="Describe la tarea contemplada">{{ rcm['tarea_contemplada'] }}</textarea>
                     </div>
                     <div class="col-md-4">
                         <label for="environment" class="form-label mt-3">Environment</label>
@@ -238,6 +252,8 @@
                         <label for="intervalo_inicial" class="form-label mt-3">Intervalo Inicial (en horas)</label>
                         <input type="number" class="form-control" id="intervalo_inicial" name="intervalo_inicial" placeholder="Intervalo Inicial" value="{{ rcm['intervalo_inicial_horas'] or '' }}">
 
+                        <label for="fuente" class="form-label mt-3">Fuente</label>
+                        <input type="text" class="form-control" id="fuente" name="fuente" placeholder="Fuente de la información" value="{{ rcm['fuente'] }}">
                     </div>
 
                 </div>

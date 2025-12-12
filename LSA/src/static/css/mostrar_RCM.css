@@ -43,7 +43,6 @@ body {
 
 .nav-link{
     color: #0c377f; /* Azul */
-    font-weight: bold;
     margin: 0;
 }
 
@@ -104,6 +103,6 @@ a{
     padding: 8px;
 }
 
-
-  
-   
+.table>:not(caption)>*>* {
+    color: #323336;
+}

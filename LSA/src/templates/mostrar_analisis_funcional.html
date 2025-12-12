@@ -8,9 +8,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/FMEA.css') }}">
 {% endblock %}
 
-
-{%block nombre%}{{ equipo.nombre_equipo }}{%endblock%}
-
 {% block body %}
 <div class="container" id="reporte" >
     <div class="row toolBar">
@@ -22,8 +19,11 @@
             <div class="buttons" style="display: flex; gap: 10px;">
                 <a href="{{ url_for('registro_analisis_funcional', id_equipo_info=id_equipo_info) }}" 
                    class="btn btn-primary">Agregar análisis funcional</a>
-                <a href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" 
-                   class="btn btn-secondary">Terminar Análisis funcional</a>
+                   <a href="{% if from_url %}{{ from_url }}{% if '?' in from_url %}&from=analisis_funcional{% else %}?from=analisis_funcional{% endif %}{% else %}{{ url_for('equipos_buque', nombre_buque=nombre_buque, from='analisis_funcional') }}{% endif %}" 
+                    class="btn btn-secondary">
+                    Terminar Análisis funcional
+                    </a>
+                           
             </div>                
         </div>
     </div>

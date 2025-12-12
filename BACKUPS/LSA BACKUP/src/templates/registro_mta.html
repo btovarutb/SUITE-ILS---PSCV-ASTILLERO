@@ -1,0 +1,592 @@
+{% extends './base.html' %}
+
+
+{% block title %}Cotecmar || Registro del MTA{% endblock %}
+
+{% block custom %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registro_mta.css') }}">
+{% endblock %}
+
+{% block title %}Registro del MTA - LORA{% endblock %}
+
+{% block body %}
+<!-- Contenido principal -->
+<div class="col" style="margin-left: 30px;">
+    <div id="hoja">
+        <h3 class="section-title text-center">Maintenance Task Analysis (MTA)</h3>
+        <h5 class="text-center" style="color: #013882;"> Para {{ nombre_equipo }} </h5>
+        <br>
+        {% if editar %}
+        <form id="mta-form" method="POST" action="{{ url_for('actualizar_MTA', mta_id=mta['id'],id_equipo_info=id_equipo_info) }}">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="sistema" class="form-label">Sistema</label>
+                    <input type="text" id="sistema" class="form-control" name="sistema" value="{{ rcm['sistema'] | default('') }}" readonly>
+                    <label for="tipo_mantenimiento" class="form-label">Tipo de mantenimiento</label>
+                    <select class="form-control" id="tipo_mantenimiento" name="tipo_mantenimiento">
+                        <option value="" disabled selected>---- Selecciona ----</option>
+                        {% for tipo in tipo_de_manteniemto %}
+                            <option value="{{ tipo['id'] }}" {% if mta['id_tipo_mantenimiento'] == tipo.id %}selected{% endif %}>{{ tipo['nombre'] }}</option>
+                        {% endfor %}
+                    </select>
+
+                </div>    
+                <div class="col-md-4">
+                    <label for="componente" class="form-label">Componente</label>
+                    <input type="text" id="componente" class="form-control" name="componente" value="{{ rcm['componente'] | default('') }}" readonly>
+
+                    <label for="tarea_mantenimiento" class="form-label">Tarea de mantenimiento</label>
+                    <select class="form-control" id="tarea_mantenimiento" name="tarea_mantenimiento">
+                        <option value="" disabled selected>---- Selecciona ----</option>
+                        {% for tarea in tarea_mantenimento %}
+                            <option value="{{ tarea['id'] }}" {% if mta['id_tarea_mantenimiento'] == tarea.id %}selected{% endif %}>{{ tarea['nombre'] }}</option>
+                        {% endfor %}
+                    </select>  
+                </div>
+                <div class="col-md-4">
+                    <label for="falla_funcional" class="form-label">Falla Funcional</label>
+                    <input type="text" id="falla_funcional" class="form-control" name="falla_funcional" value="{{ rcm['falla_funcional'] }}" readonly>
+
+                    <label for="personal_requerido" class="form-label">Cantidad de personal requerido</label>
+                    <input type="number" id="personal_requerido" name="personal_requerido" class="form-control" value="{{ mta['cantidad_personal'] }}">
+                </div>
+            </div>    
+                
+                
+            <!-- Herramientas / Equipos Requeridos -->
+            <h5 class="section-title text-center my-4">Herramientas / Equipos Requeridos</h>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                {% for key in herramientas_por_tipo %}
+                {% set key_sin_espacios = key.replace(' ', '') %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="{{ key_sin_espacios + '-tab' }}" data-bs-toggle="tab" data-bs-target="#{{ key_sin_espacios }}" type="button" role="tab" aria-controls="{{ key_sin_espacios }}" aria-selected="true">{{ key }}</button>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                {% for key in herramientas_por_tipo %}
+                {% set key_sin_espacios = key.replace(' ', '') %}
+                <div class="tab-pane fade show" id="{{ key_sin_espacios }}" role="tabpanel" aria-labelledby="{{ key_sin_espacios }}-tab">
+                    <br>
+                    {% for herramienta in herramientas_por_tipo[key] %}
+                        {% if loop.index0 % 3 == 0 %}
+                        <div class="row m-0" style="font-size: 16px; font-weight: normal; color: rgba(34, 34, 34, 0.911)">
+                        {% endif %}
+                        <div class="col-md-4 form-check">
+                            <input type="checkbox" class="form-check-input herramienta-checkbox" id="{{ herramienta.id_herramienta_requerida }}" value="{{ herramienta.id_herramienta_requerida  }}"
+                            {% if herramienta['id_herramienta_requerida'] in herramientas_mta | map(attribute='id_herramienta_requerida') %}checked{% endif %}>
+                            
+                            <label for="{{ herramienta.id_herramienta_requerida }}" class="form-check-label">{{ herramienta.nombre }}</label>
+
+                        </div>
+                        {% if loop.index0 % 3 == 2 or loop.last %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Fin Herramientas / Equipos Requeridos -->
+            
+            <!-- Primera columna -->
+            <div class="row my-4">
+                <div class="col-md-6">
+                    <label for="consumibles_requeridos" class="form-label">Consumibles requeridos</label>
+                    <input type="text" class="form-control" id="consumibles_requeridos" name="consumibles_requeridos" value="{{ mta['consumibles_requeridos'] }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="requeridos_tarea" class="form-label">Requeridos por Tarea</label>
+                    <input type="text" class="form-control" id="requeridos_tarea" name="requeridos_tarea" value="{{ mta['requeridos_tarea'] }}">
+                </div>
+            </div>
+
+            {% if repuestos %}
+            <label for="repuestos_requeridos" class="form-label">Repuestos Requeridos (referenciado del manual)</label>
+            
+            {% for repuesto in repuestos %}
+                {% if loop.index0 % 3 == 0 %}
+                    <div class="row">
+                {% endif %}
+                <div class="col-md-4 form-check">
+                    <input type="checkbox" class="form-check-input herramienta-checkbox" 
+                            id="{{ herramienta.id_herramienta_requerida }}" 
+                            name="selected_herramientas[]" 
+                            value="{{ herramienta.id_herramienta_requerida }}"
+                            {% if herramienta['id_herramienta_requerida'] in herramientas_mta | map(attribute='id_herramienta_requerida') %}checked{% endif %}>
+                    <label for="{{ herramienta.id_herramienta_requerida }}" class="form-check-label">{{ herramienta.nombre }}</label>
+                </div>
+                {% if loop.index0 % 3 == 2 or loop.last %}
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% endif %}
+
+            <!-- Fin Herramientas / Equipos Requeridos -->
+
+            <!-- Segunda columna -->
+            <div style="padding-top:10px ;">
+                <div>
+                    <label for="condiciones_requeridas_ambientales" class="form-label">Condiciones Requeridas (Ambientales)</label>
+                    <textarea class="form-control" id="condiciones_requeridas_ambientales" name="condiciones_requeridas_ambientales" rows="4" value="{{ mta['condiciones_ambientales'] }}"></textarea>
+                </div>
+                <div>
+                    <label for="condiciones_requeridas_especiales" class="form-label">Condiciones Requeridas (Especiales)</label>
+                    <textarea type="text" class="form-control" id="condiciones_requeridas_especiales" name="condiciones_requeridas_especiales" rows="4" value="{{ mta['condiciones_especiales'] }}"></textarea>
+                </div>
+            </div>    
+                
+                
+            
+
+            <!-- Tercera columna -->
+            <div class="row my-4">
+                <div class="col-md-4">
+                    <label for="condiciones_requeridas_estado_equipo" class="form-label">Condiciones Requeridas (Estado del equipo)</label>
+                    <select class="form-control" id="condiciones_requeridas_estado_equipo" name="condiciones_requeridas_estado_equipo">
+                        <option value="" disabled selected>---- Selecciona ----</option>
+                        <option value="Apagado" {% if mta['condiciones_estado_equipo'] == "Apagado" %}selected{% endif %}>Apagado</option>
+                        <option value="Apagado sin alimentacion" {% if mta['condiciones_estado_equipo'] == "Apagado sin alimentacion" %}selected{% endif %}>Apagado sin alimentación</option>
+                        <option value="Funcionando" {% if mta['condiciones_estado_equipo'] == "Funcionando" %}selected{% endif %}>Funcionando</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="duracion_tarea_horas" class="form-label">Duración de la Tarea (Horas)</label>
+                    <input type="number" class="form-control" id="duracion_tarea_horas" name="duracion_tarea_horas" value="{{ mta['horas'] }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="duracion_tarea_minutos" class="form-label">Duración de la Tarea (Minutos)</label>
+                    <input type="number" class="form-control" id="duracion_tarea_minutos" name="duracion_tarea_minutos" value="{{ mta['minutos'] }}">
+                </div>
+                
+            </div>
+
+            <div>
+                <label for="detalle_tarea" class="form-label">Detalle de tarea</label>
+                <textarea class="form-control" id="detalle_tarea" name="detalle_tarea" rows="4" value="{{ mta['detalle_tarea'] }}"></textarea>
+            </div>
+            <br>
+            <!-- checkbox por repuesto -->
+            <h3 class="section-title text-center">Level Of Repair Analysis (LORA)</h3>
+
+            <div class="mt-3 popup">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                    id="startQuizBtn">
+                    Realizar Cuestionario LORA
+                </button>
+
+                <!-- El Modal (popup) -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Cuestionario LORA</h5>
+                                <button id="startQuizBtn" type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <label id="questionText" class="d-block mb-3"></label>
+                                <div id="answers">
+                                    <!-- Los botones "Sí" y "No" -->
+                                    <button type="button" class="btn btn-primary me-2" id="yesBtn">Sí</button>
+                                    <button type="button" class="btn btn-primary" id="noBtn">No</button>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <br><br>
+                                <button type="button" class="btn btn-secondary" id="backBtn"><i
+                                        class="bi bi-arrow-left-circle-fill"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Nivel</th>
+                        <th scope="col">Actividades (LORA)</th>
+                        <th scope="col">Operario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-select" id="nivel_lora" name="nivel">
+
+                                <option value="1" {% if lora_mta['nivel']=="1" %}selected{% endif %}>I</option>
+                                <option value="2" {% if lora_mta['nivel']=="2" %}selected{% endif %}>II</option>
+                                <option value="3" {% if lora_mta['nivel']=="3" %}selected{% endif %}>III</option>
+                                <option value="4" {% if lora_mta['nivel']=="4" %}selected{% endif %}>IV</option>
+                                <option value="5" {% if lora_mta['nivel']=="5" %}selected{% endif %}>V</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="form-control gray-input" id="actividades" name="actividades" readonly
+                                value="{{ lora_mta['actividades'] }}"></td>
+                        <td>
+                            <select class="form-select" id="operario_lora" name="operario">
+                            </select>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Botón siguiente -->
+            <div class="text-end mt-4">
+                <button class="btn btn-danger" onclick="window.history.back();">Cancelar</button>
+                <button type="submit" class="btn btn-siguiente" id="btn-siguiente">Actualizar MTA</button>
+            </div>
+        </form>
+        {% else %}
+        <form id="mta-form" method="POST" action="{{ url_for('guardar_MTA', fmea_id=fmea['id'],id_equipo_info=id_equipo_info) }}">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="sistema" class="form-label">Sistema</label>
+                    <input type="text" id="sistema" class="form-control" name="sistema"
+                        value="{{ fmea['sistema'] | default('') }}" readonly>
+                    <label for="tipo_mantenimiento" class="form-label">Tipo de mantenimiento</label>
+                    <select class="form-control" id="tipo_mantenimiento" name="tipo_mantenimiento">
+                        <option value="" disabled selected>---- Selecciona ----</option>
+                        {% for tipo in tipo_de_manteniemto %}
+                        <option value="{{ tipo['id'] }}">{{ tipo['nombre'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="componente" class="form-label">Componente</label>
+                    <input type="text" id="componente" class="form-control" name="componente"
+                        value="{{ fmea['componente'] | default('') }}" readonly>
+
+                    <label for="tarea_mantenimiento" class="form-label">Tarea de mantenimiento</label>
+                    <select class="form-control" id="tarea_mantenimiento" name="tarea_mantenimiento">
+                        <option value="" disabled selected>---- Selecciona ----</option>
+                        {% for tarea in tarea_mantenimento %}
+                        <option value="{{ tarea['id'] }}">{{ tarea['nombre'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="falla_funcional" class="form-label">Falla Funcional</label>
+                    <input type="text" id="falla_funcional" class="form-control" name="falla_funcional"
+                        value="{{ fmea['falla_funcional'] }}" readonly>
+
+                    <label for="personal_requerido" class="form-label">Cantidad de personal requerido</label>
+                    <input type="number" id="personal_requerido" name="personal_requerido" class="form-control">
+                </div>
+
+
+                <!-- Herramientas / Equipos Requeridos -->
+                <h5 class="section-title text-center my-4">Herramientas / Equipos Requeridos</h5>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    {% for key in herramientas_por_tipo %}
+                    {% set key_sin_espacios = key.replace(' ', '') %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="{{ key_sin_espacios + '-tab' }}" data-bs-toggle="tab"
+                            data-bs-target="#{{ key_sin_espacios }}" type="button" role="tab"
+                            aria-controls="{{ key_sin_espacios }}" aria-selected="true">{{ key }}</button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    {% for key in herramientas_por_tipo %}
+                    {% set key_sin_espacios = key.replace(' ', '') %}
+                    <div class="tab-pane fade show" id="{{ key_sin_espacios }}" role="tabpanel"
+                        aria-labelledby="{{ key_sin_espacios }}-tab">
+                        <br>
+                        {% for herramienta in herramientas_por_tipo[key] %}
+                        {% if loop.index0 % 3 == 0 %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="col-md-4 form-check">
+                                <input type="checkbox" class="form-check-input herramienta-checkbox"
+                                    id="{{ herramienta.id_herramienta_requerida  }}"
+                                    value="{{ herramienta.id_herramienta_requerida  }}">
+                                <label for="{{ herramienta.id_herramienta_requerida }}" class="form-check-label">{{
+                                    herramienta.nombre }}</label>
+                            </div>
+                            {% if loop.index0 % 3 == 2 or loop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Fin Herramientas / Equipos Requeridos -->
+
+                <!-- Primera columna -->
+                <div class="row my-4">
+                    <div class="col-md-6">
+                        <label for="consumibles_requeridos" class="form-label">Consumibles requeridos</label>
+                        <input type="text" class="form-control" id="consumibles_requeridos" name="consumibles_requeridos">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="requeridos_tarea" class="form-label">Requeridos por Tarea</label>
+                        <input type="text" class="form-control" id="requeridos_tarea" name="requeridos_tarea">
+                    </div>
+                </div>
+
+                {% if repuestos %}
+                <label for="repuestos_requeridos" class="form-label">Repuestos Requeridos (referenciado del manual)</label>
+                {% endif %}
+                {% for repuesto in repuestos %}
+                {% if loop.index0 % 3 == 0 %}
+                <div class="row">
+                    {% endif %}
+                    <div class="col-md-4 form-check">
+                        <input type="checkbox" class="form-check-input repuesto-checkbox" id="{{ repuesto.id }}"
+                            value="{{ repuesto.id }}">
+                        <label for="{{ repuesto.id }}" class="form-check-label">{{ repuesto.nombre_repuesto }}</label>
+                    </div>
+                    {% if loop.index0 % 3 == 2 or loop.last %}
+                </div>
+                {% endif %}
+                {% endfor %}
+
+                <div style="padding-top:10px ;">
+                    <label for="condiciones_requeridas_ambientales" class="form-label">Condiciones Requeridas
+                        (Ambientales)</label>
+                    <textarea class="form-control" id="condiciones_requeridas_ambientales"
+                        name="condiciones_requeridas_ambientales" rows="4" placeholder="Escribe tus comentarios aquí..."></textarea>
+                </div>
+
+                <div style="padding-top:10px ;">
+                    <label for="condiciones_requeridas_especiales" class="form-label">Condiciones Requeridas
+                        (Especiales)</label>
+                    <textarea class="form-control" id="condiciones_requeridas_especiales"
+                        name="condiciones_requeridas_especiales"  rows="4" placeholder="Escribe tus comentarios aquí..."></textarea>
+                </div>
+                <!-- Tercera columna -->
+                <div class="row my-4">
+                    <div class="col-md-4">
+                        <label for="condiciones_requeridas_estado_equipo" class="form-label">Condiciones Requeridas (Estado
+                            del equipo)</label>
+                        <select class="form-control" id="condiciones_requeridas_estado_equipo"
+                            name="condiciones_requeridas_estado_equipo">
+                            <option value="" disabled selected>---- Selecciona ----</option>
+                            <option value="Apagado">Apagado</option>
+                            <option value="Apagado sin alimentacion">Apagado sin alimentación</option>
+                            <option value="Funcionando">Funcionando</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="duracion_tarea_horas" class="form-label">Duración de la Tarea (Horas)</label>
+                        <input type="number" class="form-control" id="duracion_tarea_horas" name="duracion_tarea_horas">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="duracion_tarea_minutos" class="form-label">Duración de la Tarea (Minutos)</label>
+                        <input type="number" class="form-control" id="duracion_tarea_minutos" name="duracion_tarea_minutos">
+                    </div>
+                </div>
+                <div style="padding-bottom:20px ;">
+                    <label for="detalle_tarea" class="form-label">Detalle de tarea</label>
+                    <textarea class="form-control" id="detalle_tarea" name="detalle_tarea"  rows="4" placeholder="Escribe tus comentarios aquí..."></textarea>
+                </div>
+                <h2 class="section-title text-center">Level Of Repair Analysis (LORA)</h2>
+
+                <div class="mt-3 popup">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                        id="startQuizBtn">
+                        Realizar Cuestionario LORA
+                    </button>
+
+                    <!-- El Modal (popup) -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Cuestionario LORA</h5>
+                                    <button id="startQuizBtn" type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <label id="questionText" class="d-block mb-3"></label>
+                                    <div id="answers">
+                                        <!-- Los botones "Sí" y "No" -->
+                                        <button type="button" class="btn btn-primary me-2" id="yesBtn">Sí</button>
+                                        <button type="button" class="btn btn-primary" id="noBtn">No</button>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <br><br>
+                                    <button type="button" class="btn btn-secondary" id="backBtn"><i
+                                            class="bi bi-arrow-left-circle-fill"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>        
+
+                <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Nivel</th>
+                        <th scope="col">Actividades (LORA)</th>
+                        <th scope="col">Operario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                        <select class="form-select" id="nivel_lora" name="nivel">
+                            <option value="1" {% if lora_mta['nivel'] == "1" %}selected{% endif %}>I</option>
+                            <option value="2" {% if lora_mta['nivel'] == "2" %}selected{% endif %}>II</option>
+                            <option value="3" {% if lora_mta['nivel'] == "3" %}selected{% endif %}>III</option>
+                            <option value="4" {% if lora_mta['nivel'] == "4" %}selected{% endif %}>IV</option>
+                            <option value="5" {% if lora_mta['nivel'] == "5" %}selected{% endif %}>V</option>
+                        </select>
+                        </td>
+                        <td><input type="text" class="form-control" id="actividades" name="actividades" readonly value="{{ lora_mta['actividades'] }}"></td>
+                        <td>
+                        <select class="form-select" id="operario_lora" name="operario">
+                        </select>
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+                <!-- Botón siguiente -->
+                <div class="text-end mt-4">
+                    <button class="btn btn-danger" onclick="window.history.back();">Cancelar</button>
+                    <button type="submit" class="btn btn-siguiente" id="btn-siguiente">Actualizar MTA</button>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+        
+
+
+<script src="{{ url_for('static', filename='js/cuestionario_lora.js') }}"></script>
+<script src="{{ url_for('static', filename='js/registro_mta.js') }}"></script>
+<script>
+document.getElementById('mta-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const herramientaCheckboxes = document.querySelectorAll('.herramienta-checkbox:checked');
+    const selectedHerramientas = Array.from(herramientaCheckboxes).map(cb => cb.value);
+
+
+    // Crear y agregar campo oculto para herramientas seleccionadas
+    const hiddenHerramientasField = document.createElement('input');
+    hiddenHerramientasField.type = 'hidden';
+    hiddenHerramientasField.name = 'selected_herramientas';
+    hiddenHerramientasField.value = JSON.stringify(selectedHerramientas);
+    this.appendChild(hiddenHerramientasField);
+
+    const repuestoCheckboxes = document.querySelectorAll('.repuesto-checkbox:checked');
+    const selectedRepuestos = Array.from(repuestoCheckboxes).map(cb => cb.value);
+    const hiddenRepuestosField = document.createElement('input');
+    hiddenRepuestosField.type = 'hidden';
+    hiddenRepuestosField.name = 'selected_repuestos';
+    hiddenRepuestosField.value = JSON.stringify(selectedRepuestos);
+    this.appendChild(hiddenRepuestosField);
+    this.submit();
+});
+
+
+</script>
+<script>
+    const selectedHerramientas = [];
+
+    // Función para actualizar la lista de herramientas seleccionadas
+    function updateSelectedHerramientas() {
+        const checkboxes = document.querySelectorAll('.herramienta-checkbox');
+        selectedHerramientas.length = 0; // Limpiar el array
+
+        checkboxes.forEach(function (checkbox) {
+
+            if (checkbox.checked) {
+                selectedHerramientas.push(checkbox.value);
+            }
+        });
+
+        // Mostrar en consola las herramientas seleccionadas
+        console.log('Herramientas seleccionadas:', selectedHerramientas);
+        document.getElementById('selected_herramientas').value = JSON.stringify(selectedHerramientas);
+    }
+
+    // Agregar evento change a los checkboxes
+    document.querySelectorAll('.herramienta-checkbox').forEach(function (checkbox) {
+
+        checkbox.addEventListener('change', updateSelectedHerramientas);
+    });
+
+    // Actualizar la lista al cargar la página
+    updateSelectedHerramientas();
+</script>
+<script>
+    // Opciones de operarios para cada nivel
+    const operarioOptions = {
+        "1": [
+            { value: "Nivel operador", text: "Nivel operador" },
+            { value: "Técnicas de nivel aprendiz", text: "Técnicas de nivel aprendiz" }
+        ],
+        "2": [
+            { value: "Técnico intermedio con curso básico del equipo", text: "Técnico intermedio con curso básico del equipo" }
+        ],
+        "3": [
+            { value: "Técnicos del más alto nivel en la empresa con varios años de experiencia y cursos avanzados sobre del equipo", text: "Técnicos del más alto nivel en la empresa con varios años de experiencia y cursos avanzados sobre del equipo" }
+        ],
+        "4": [
+            { value: "Grupo de trabajo con experiencia previa", text: "Grupo de trabajo con experiencia previa" },
+            { value: "Técnicos de varias disciplanas bajo dirección de un ingeniero de campo", text: "Técnicos de varias disciplanas bajo dirección de un ingeniero de campo" },
+            { value: "Labores de planeación corresponden a otro nivel dentro de la misma organización", text: "Labores de planeación corresponden a otro nivel dentro de la misma organización" },
+            { value: "Apoyo de talleres especializados", text: "Apoyo de talleres especializados" }
+        ],
+        "5": [
+            { value: "Grupo de trabajo con experiencia previa", text: "Grupo de trabajo con experiencia previa" },
+            { value: "Técnicos de varias disciplanas bajo dirección de un ingeniero de campo", text: "Técnicos de varias disciplanas bajo dirección de un ingeniero de campo" },
+            { value: "Labores de planeación corresponden a otro nivel dentro de la misma organización", text: "Labores de planeación corresponden a otro nivel dentro de la misma organización" },
+            { value: "Apoyo permanente del fabricante", text: "Apoyo permanente del fabricante" },
+
+        ]
+    };
+
+    const nivelSelect = document.getElementById('nivel_lora');
+    const operarioSelect = document.getElementById('operario_lora');
+
+    // Función para cargar todas las opciones inicialmente
+    function loadAllOperarioOptions() {
+        operarioSelect.innerHTML = ''; // Limpia el select
+
+        Object.values(operarioOptions).flat().forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option.value;
+            opt.textContent = option.text;
+            operarioSelect.appendChild(opt);
+        });
+    }
+
+    // Función para filtrar las opciones según el nivel
+    function filterOperarioOptions() {
+        const selectedNivel = nivelSelect.value;
+
+        if (selectedNivel) {
+            // Limpia las opciones actuales
+            operarioSelect.innerHTML = '';
+
+            // Agrega solo las opciones correspondientes al nivel seleccionado
+            operarioOptions[selectedNivel].forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.value;
+                opt.textContent = option.text;
+                operarioSelect.appendChild(opt);
+            });
+        }
+    }
+
+    // Escucha cambios en el nivel seleccionado
+    nivelSelect.addEventListener('change', filterOperarioOptions);
+
+    // Cargar todas las opciones al cargar la página
+    loadAllOperarioOptions();
+</script>
+
+{% endblock %}
+

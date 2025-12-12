@@ -17,5 +17,9 @@
 </style>
 {% endblock %}
 {%block content%}
-    <a id="terminar-analisis-funcional" href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" class="btn btn-primary1 Terminar">Terminar Análisis Funcional</a>
+    <a id="terminar-analisis-funcional" 
+    href="{% if from_url %}{{ from_url }}{% if '?' in from_url %}&from=analisis_funcional{% else %}?from=analisis_funcional{% endif %}{% else %}{{ url_for('equipos_buque', nombre_buque=nombre_buque, from='analisis_funcional') }}{% endif %}" 
+    class="btn btn-primary1 Terminar">
+    Terminar Análisis Funcional
+    </a>
 {% endblock %}

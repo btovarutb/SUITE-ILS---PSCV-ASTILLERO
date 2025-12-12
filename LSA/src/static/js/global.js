@@ -39,4 +39,9 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('load', function () {
         hideLoading();
     });
+
+    // ✅ NUEVO: Ocultar spinner si el usuario navega con el botón "atrás"
+    window.addEventListener('pageshow', function (event) {
+        hideLoading();
+    });
 });

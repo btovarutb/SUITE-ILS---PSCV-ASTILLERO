@@ -1,7 +1,7 @@
 {% extends './base.html' %}
 
 
-{% block nombre %}LSA{% endblock %}
+{% block title %}LSA{% endblock %}
 {% block body %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fua_stress.css') }}">
 
@@ -31,7 +31,7 @@
                                     data-id="{{ equipo.id }}" 
                                     data-fua-fr='{{ equipo.fua_fr | tojson | replace("\"", "&quot;") | safe }}' 
                                     onclick="cargarEquipo('{{ equipo.id }}')">
-                                    {{ equipo.nombre_equipo }}
+                                    (CJ: {{equipo.cj}}) {{ equipo.nombre_equipo }} 
                                 </button>
                             {% endfor %}                
                         {% else %}
@@ -184,9 +184,10 @@
 
     <script>
 function configurarInputsYCalcular(fuaFrData) {
-    const datosPuertoBase = JSON.parse('{{ datosPuertoBase | tojson | safe }}');
-    const puertoBase = datosPuertoBase[0]; // Tomamos el primer elemento del array
+    const datosPuertoBase = JSON.parse('{{ datosPuertoBase | tojson }}');
+    const puertoBase = datosPuertoBase; // Tomamos el primer elemento del array
 
+    console.log(datosPuertoBase)
     // Definir valores estáticos
     const valoresEstaticos = {
         disponible_para_misiones: parseFloat(puertoBase.disponible_misiones_1) || 0,
@@ -248,7 +249,7 @@ function configurarInputsYCalcular(fuaFrData) {
         const resultadoInputPorcentaje = document.getElementById('resultado-fua-porcentaje');
         if (resultadoInput) {
             resultadoInput.value = resultadoTotal.toFixed(2);
-            resultadoInputPorcentaje.value = (8760 / resultadoTotal).toFixed(2);
+            resultadoInputPorcentaje.value = ( (resultadoTotal /8760)*100).toFixed(2);
         }
     }
 

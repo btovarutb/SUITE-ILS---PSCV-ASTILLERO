@@ -3,6 +3,12 @@ import os
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', '773e2996b970504daadaf2625cfc07187e23035e4686aa8dade5bcb2ca190d13')
+    
+    # URLs de los diferentes entornos
+    LOCAL_URL = os.environ.get('LOCAL_URL', 'http://localhost:5000')
+    EXTERNAL_URL_1 = os.environ.get('EXTERNAL_URL_1', 'http://localhost:8010')
+    DOCKER_EXTERNAL_URL_1 = os.environ.get('DOCKER_EXTERNAL_URL_1', 'http://host.docker.internal:8010')
+    EXTERNAL_URL_2 = os.environ.get('EXTERNAL_URL_2', 'http://localhost:8080')
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -30,10 +36,10 @@ class DevelopmentConfig(Config):
     MYSQL_POOL_SIZE = int(os.environ.get('MYSQL_POOL_SIZE', 5))  # Máximo tamaño del pool de conexiones
     MYSQL_MAX_OVERFLOW = int(os.environ.get('MYSQL_MAX_OVERFLOW', 10))  # Conexiones adicionales permitidas en caso de alta demanda
 
-    # Configuración general de Flask
+    # Configuracón general de Flask
     SESSION_COOKIE_SECURE = False  # Cambiar a True en producción
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = 'None'
 
 config = {
     'development': DevelopmentConfig

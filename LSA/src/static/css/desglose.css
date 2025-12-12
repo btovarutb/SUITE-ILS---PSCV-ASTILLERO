@@ -4,26 +4,46 @@ body {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* Asegurar que el navbar permanece blanco */
-.navbar {
-    background-color: rgb(255, 255, 255) !important;
-    position: sticky;  /* Hace que el elemento sea pegajoso */
-    top: 0;            /* El valor de 'top' define a partir de qué punto se pega */
-    z-index: 1000;     /* Asegura que esté por encima de otros elementos */
+.light-text {
+    font-weight: 300; /* Inter Light */
 }
 
-/* General layout */
-.grid-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px; /* Espacio mayor entre tarjetas */
-    margin-top: 20px; /* Reducido el margen superior */
-    justify-content: space-around;
+.regular-text {
+    font-weight: 400; /* Inter Regular */
 }
+
+.medium-text {
+    font-weight: 500; /* Inter Medium */
+}
+
+.semibold-text {
+    font-weight: 600; /* Inter SemiBold */
+}
+
+.bold-text {
+    font-weight: 700; /* Inter Bold */
+}
+
+.extrabold-text {
+    font-weight: 800; /* Inter ExtraBold */
+}
+
+.black-text {
+    font-weight: 900; /* Inter Black */
+}
+
+/* Asegurar que el navbar permanece blanco */
+.navbar {
+  background-color: #fff !important;
+  position: static;   /* ← antes estaba sticky */
+  top: auto;
+  z-index: auto;
+}
+
 
 /* Estilos para las tarjetas */
 .card {
-    width: 300px; /* Tamaño de tarjeta ajustado */
+    width: 22%; /* Tamaño de tarjeta ajustado */
     height: 202px; /* Ajuste de altura */
     background-color: white;
     box-shadow: 0 4px 10px rgba(123, 115, 235, 0.473);
@@ -37,6 +57,7 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 10px;
     
 }
 
@@ -87,8 +108,8 @@ body {
 }
 /* Estilos para los botones */
 #nuevoEquipoBtn {
-    padding: 8px 16px;
-    background-color: #013882; /* Azul oscuro */
+    padding: 8px 8px;
+    background-color: #003366; /* Azul oscuro */
     color: white;
     border: none;
     border-radius: 4px;
@@ -96,14 +117,14 @@ body {
     height: 42px;
     max-height: 100px;
     z-index: 10;
-    width: 180px;
+    width: 155px;
 }
 #nuevoEquipoBtn:hover {
     background-color: rgb(13, 2, 63); /* Azul más oscuro al pasar el mouse */
 }
 #buscarBtn, #buscarBtnGeneral, #buscarBtnBuque {
     border: none;
-    background-color: #013882;
+    background-color: #003366;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     height: 42px;
@@ -113,7 +134,7 @@ body {
 /* Botón de volver */
 #volverBtn {
     text-align: center;
-    width: 80px;
+    width: 100px;
 }
 
 .volverBtn {
@@ -126,16 +147,15 @@ body {
 }
 
 .volverBtn, .volverBtn i{
-    color: #013882;
+    color: #003366;
     font-size: 18px;
 }
 
 .search-bar p{
     margin: 0;
     text-align: left;
-    font-weight: bold;
-    color: #013882;
-    border-left: 3px solid #013882; /* Color y grosor de la línea */
+    color: rgb(33, 37, 41);
+    border-left: 3px solid #003366; /* Color y grosor de la línea */
     padding-left: 10px; /* Espacio entre la línea y el texto */
     line-height: 1.5; /* Ajusta el espaciado de línea */
     height: 24px;
@@ -156,19 +176,20 @@ body {
 }
 /* Iconos */
 i {
-    color: white;
+    /*color: white;*/
 }
 
 /* Ajuste adicional para la distancia y posición de los elementos */
 .grid-container {
     display: flex;
-    justify-content: space-around; /* Espacio uniforme entre las tarjetas */
     flex-wrap: wrap;
     margin-top: 10px; /* Ajuste adicional para que queden más pegadas arriba */
     padding-top: 0;
     padding-bottom: 2rem;
     padding-left: 3rem;
     padding-right: 3rem;
+    gap: 4%; /* Espacio mayor entre tarjetas */
+    justify-content: flex-start;
 }
 
 .dynamic-card {
@@ -180,7 +201,7 @@ i {
     text-align: center;
     display: flex;
     flex-direction: column; /* Coloca el contenido en columna */
-    justify-content: center; /* Alinea el contenido en la parte superior */
+    justify-content: flex-start; /* Alinea el contenido en la parte superior */
     align-items: center;
     font-size: 16px;
     color: #003366; /* Color de texto */
@@ -193,16 +214,21 @@ i {
     transform: scale(1.05); /* Efecto de hover */
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Sombra más marcada */
 }
-.overlay-text {
+
+
+[data-type="grupo"] .overlay-text {
     position: absolute;
     top: 62%;
-    left: 20%;
-    transform: translate(-50%, -50%); /* Ajuste para centrar */
-    color: white; /* Texto blanco */
-    font-size: 40px; /* Ajusta el tamaño según necesidad */
-    font-weight: bold; /* Texto en negrita */
-    pointer-events: none; /* Evita que el texto interfiera con clics en la imagen */
+    left: 55px;
+    transform: translate(-50%, -50%); 
+    color: white; 
+    font-size: 40px; 
+    font-weight: bold; 
+    pointer-events: none; 
 }
+
+*/
+
 .image-container {
     position: relative;
     display: inline-block;
@@ -246,18 +272,17 @@ i {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    width: 180px;
 }
 
 .card_equipos{
-    width: 250px;
-    height: 100px;
+    height: 164px;
     background-color: white;
     box-shadow: 0 4px 10px rgba(123, 115, 235, 0.473);
     border-radius: 8px;
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     font-size: 18px;
     color: #003366;
@@ -265,15 +290,14 @@ i {
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .card_equipos h1 {
-    font-size: 18px;
-    color: #004AAD;
-    margin-top: 10px;
-    margin-bottom: 0;
-    margin-left: 15px;
-    margin-right: 15px;
+    font-size: 14px;
+    color: #003366;
+    margin: 5px 0;
     font-weight: 800;
     text-transform: uppercase;
+    text-align: center;
 }
 
 #desgloseButton, #botonBloque {
@@ -367,4 +391,44 @@ i {
 .btn-danger{
     background-color: #730C02;
     border-color: #730C02;
+}
+
+[data-type="equipo"] .overlay-text {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #003366;
+}
+
+[data-type="equipo"] img{
+    width: 100%;
+    height: 122px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    object-fit: cover;
+}
+
+
+.centered-content {
+    justify-content: center !important;
+}
+
+
+.btn-azul{
+    background-color: #003366;
+    border-color: #003366;
+    color: white;
+}
+
+.btn-azul:hover{
+    background-color: #002244;
+    border-color: #002244;
+    color: white;
 }

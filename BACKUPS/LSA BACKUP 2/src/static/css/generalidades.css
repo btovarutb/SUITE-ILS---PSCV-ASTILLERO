@@ -1,0 +1,219 @@
+body {
+    background-color: #f5f5f5;
+}
+
+.navbar{
+    position: sticky;  /* Hace que el elemento sea pegajoso */
+    top: 0;            /* El valor de 'top' define a partir de qué punto se pega */
+    z-index: 1000;     /* Asegura que esté por encima de otros elementos */
+    /* Otros estilos que necesites para el diseño */
+}
+.navbarvertical {
+    width: auto;
+    padding: 10px;
+}
+.navbarvertical .nav-link {
+    white-space: nowrap;
+}
+.navbar-toggler {
+    border-color: #0c377f;
+}
+.custom-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 0, 0, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    width: 43px !important;
+    align-items: center;
+}
+.col-auto{
+    align-items: center;
+}
+
+.section-title {
+    color:  #0c377f !important;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-label {
+    font-weight: bold; 
+    display: block;
+}
+
+.form-control {
+    margin-bottom: 0;
+}
+
+.nav-link{
+    color: #0c377f;
+    font-weight: bold;
+}
+
+.col{
+    padding:35px 85px 30px 45px;
+    
+}
+
+.navbar-toggler-icon{
+    padding:60px 0;
+    text-align: center;
+}
+.btn-primary {
+    background-color:#003366;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #01182e;
+}
+
+.nav-item.active{
+    background-color: #0c367f3a;
+    border-radius: 10px;
+}
+
+.nav-item:hover{
+    background-color: #0c367f17;
+    border-radius: 10px;
+}
+
+.btn-secondary, .btn-danger{
+    margin:0;
+    padding: 0;
+    border:none;
+    width: 40px; /* Ajusta el tamaño del botón según lo que necesites */
+    height: 40px;
+
+}
+
+.btn-secondary:hover, .btn-danger:hover{
+    margin:0;
+    padding: 0;
+    border:none;
+    width: 40px; /* Ajusta el tamaño del botón según lo que necesites */
+    height: 40px;
+}
+
+.bi-plus-circle, .bi-trash-fill{
+    font-size: 20px;
+    margin-bottom: none;
+}
+
+#reporte {
+    max-width: 96.4% !important;
+    padding: 0;
+    background-color: white;
+    margin-top: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(123, 115, 235, 0.473);
+    margin-right: 1.5rem;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.buttons {
+    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.padding{
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+}
+
+.buttons .active {
+    background-color: #003366 !important;
+    color: white !important;
+}
+.buttons button {
+    align-items: center;
+    background-color: rgb(229 231 235);
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 8px;
+    border-radius: .25rem;
+    border: none !important;
+}
+
+.buttons button:hover{
+    background-color: rgb(194, 195, 197);
+}
+
+#header{
+    margin-top: 1.5rem;
+    margin-right: 1.5rem;
+    margin-left: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+#header p{
+    margin: 0;
+    text-align: left;
+    font-weight: bold;
+    color: #003366;
+    border-left: 3px solid #003366; /* Color y grosor de la línea */
+    padding-left: 10px; /* Espacio entre la línea y el texto */
+    line-height: 1.5; /* Ajusta el espaciado de línea */
+    margin-left: 20px;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+
+
+.volverBtn {
+    padding: 12px 0;
+    background-color: transparent; /* Azul oscuro */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.volverBtn, .volverBtn i{
+    color: #003366;
+    font-size: 18px;
+}
+
+.form-label {
+    margin-bottom: 0;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.tab-button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.btn-danger{
+    background-color: #730C02;
+    border-color: #730C02;
+    padding: 8px;
+}
+
+.btn-primary{
+    background-color: #0c377f;
+    border-color: #0c377f;
+}
+
+.btn-warning{
+    background-color: #F0B040;
+    border-color: #F0B040;
+    padding: 8px;
+}

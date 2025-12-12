@@ -1,0 +1,91 @@
+{% extends './base.html' %}
+
+{%block custom%}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fua_buque.css') }}">
+{%endblock%}
+
+{% block title %}LSA{% endblock %}
+
+{% block body %}
+
+    <div class="fua-header">
+        <div class="d-flex align-items-center">
+            <!-- Span FUA -->
+            <span class="titulo-fua">FUA</span>
+
+            <!-- Frase Factor de utilización anual -->
+            <span class="label-fua">
+                Factor de utilización anual
+            </span>
+        </div>
+
+        <!-- Nombre del buque -->
+        <span class="nombre-buque">
+            {{ nombre_buque }}
+        </span>
+
+        <span class="nombre-buque">
+            Calculo de AOR para equipos
+        </span>
+        
+    </div>
+
+
+    
+    <div id="desglose-container" class="flex gap-2 p-3 bg-white rounded shadow">
+
+        <div id="grupos-container" class="grupos-expanded-inicial">
+            <h3 class="titulo-col">Grupos Constructivos</h3>
+            <div id="grupos-list" class="space-y-2"></div>
+        </div>
+    
+        <div id="toggle-bar" class="hide" onclick="toggleGrupos()">
+            <i id="chevron-icon" class="bi bi-chevron-left"></i>
+            <span class="rotated-label">GRUPOS</span>
+        </div>
+    
+        <div id="equipos-container" class="equipos-expanded-inicial">
+            <h3 class="titulo-col">Equipos</h3>
+            <div id="equipos-content">
+                <div id="filtro-sistemas-container" class="hidden row">
+                    <div class="col-6 relative floating-group">
+                        <select id="filtro-sistemas" class="floating-input peer">
+                            <option value=""></option>
+                            <option value="">Todos los sistemas</option>
+                        </select>
+                        <label for="filtro-sistemas" class="floating-label">Filtrar por sistema</label>
+                    </div>
+                    <div class="col-6 relative floating-group">
+                        <input type="text" id="buscar-equipo" class="floating-input peer" />
+                        <label for="buscar-equipo" class="floating-label">Buscar equipo</label>
+                    </div>
+                </div>
+                
+                <div id="list-group-equipos" class="list-group-equipos flex flex-col gap-2">
+                    <div class="no-equipos-msg text-center text-gray-500">Seleccione un grupo constructivo.</div>
+                </div>
+            </div>     
+        </div>
+    
+        <div id="detalle-equipo-container" class="d-none">
+            <h3 class="titulo-col">Detalles del equipo seleccionado</h3>
+            <div id="detalle-equipo" class="text-gray-700 space-y-2">
+                <div id="contenedor-fua-fr"></div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    
+
+    <script>
+        window.buqueId = {{ buque_id }};
+        window.equiposGlobal = {{ equipos | tojson | safe }};
+    </script>
+    
+    <script src="{{ url_for('static', filename='js/fua_buque.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/global.js') }}"></script>
+    
+
+{% endblock %}

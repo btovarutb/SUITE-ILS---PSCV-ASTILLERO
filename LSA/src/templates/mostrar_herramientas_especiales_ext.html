@@ -14,5 +14,7 @@
 </style>
 {% endblock %}
 {%block content%}
-    <a class="terminar" href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" class="btn btn-primary1 Terminar">Terminar Modulo de Herramientas</a>
+<a href="{% if from_url %}{{ from_url }}{% if '?' in from_url %}&from=modulo_herramientas{% else %}?from=modulo_herramientas{% endif %}{% else %}{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info) }}{% endif %}" 
+   class="btn btn-primary1 terminar">Terminar Módulo de Herramientas</a>
+
 {% endblock %}

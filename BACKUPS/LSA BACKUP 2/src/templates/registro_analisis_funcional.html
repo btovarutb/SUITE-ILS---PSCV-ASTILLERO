@@ -1,0 +1,163 @@
+{% extends './base.html' %}
+
+{% block title %}Cotecmar || Registro - Análisis Funcional{% endblock %}
+
+{% block custom %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analisis_funcional.css') }}">
+{% endblock %}
+
+{% block title %}LSA | Registro de Análisis Funcional{% endblock %}
+
+{% block body %}
+
+<script>
+function cargarComponentes() {
+    var subsistemaId = document.getElementById('subsistema').value;
+    if (subsistemaId) {
+        fetch(`/api/componentes/${subsistemaId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Componentes recibidos:', data);  // Verificar los datos recibidos
+                var componentesDiv = document.getElementById('componentes');
+                componentesDiv.innerHTML = '';  // Limpiar el contenido anterior
+
+                if (data.componentes.length > 0) {
+                    data.componentes.forEach(function(componente) {
+                        // Crear un contenedor de fila para el componente
+                        var divComponente = document.createElement('div');
+                        divComponente.classList.add('row', 'mb-3', 'align-items-center');  // Fila con margen y alineado
+
+                        // Crear el contenedor para el nombre del componente (columna 3)
+                        // Crear el contenedor para el nombre del componente (columna 3)
+                        var id_ = document.createElement('input');
+                        id_.id =  `id_${componente.id}`;
+                        id_.value = `${componente.id}`;
+                        id_.name = `id_`;
+                        id_.style.display = 'none';
+
+                        var divNombre = document.createElement('div');
+                        divNombre.classList.add('col-md-4');  // 4/12 del ancho para el nombre
+                        // Crear el label que diga 'Items'
+                        var labelComponente = document.createElement('label');
+                        labelComponente.textContent = 'Items';  // Texto del label
+                        labelComponente.classList.add('form-label', 'fw-bold');
+                        // Crear un párrafo para mostrar el nombre del componente
+                        var pNombreComponente = document.createElement('p');
+                        pNombreComponente.textContent = componente.nombre;  // Nombre del componente
+                        pNombreComponente.classList.add('mb-0');  // Clase para mantener margen inferior en cero
+                        // Añadir el label y el párrafo al divNombre
+                        divNombre.appendChild(labelComponente);
+                        divNombre.appendChild(pNombreComponente);
+
+
+                        // Crear el contenedor para el input del verbo (columna 4)
+                        var divVerbo = document.createElement('div');
+                        divVerbo.classList.add('col-md-4');  // 4/12 del ancho para el verbo
+                        var labelVerbo = document.createElement('label');
+                        labelVerbo.textContent = 'Verbo';
+                        labelVerbo.classList.add('form-label', 'd-block');
+                        labelVerbo.setAttribute('for', `verbo_${componente.id}`);
+                        var inputVerbo = document.createElement('input');
+                        inputVerbo.type = 'text';
+                        inputVerbo.name = `verbo_${componente.id}`;
+                        inputVerbo.id = `verbo_${componente.id}`;
+                        inputVerbo.classList.add('form-control');
+                        inputVerbo.placeholder = 'Verbo';
+                        divVerbo.appendChild(labelVerbo);
+                        divVerbo.appendChild(inputVerbo);
+
+                        // Crear el contenedor para el input de la acción (columna 4)
+                        var divAccion = document.createElement('div');
+                        divAccion.classList.add('col-md-4');  // 4/12 del ancho para la acción
+                        var labelAccion = document.createElement('label');
+                        labelAccion.textContent = 'Acción';
+                        labelAccion.classList.add('form-label', 'd-block');
+                        labelAccion.setAttribute('for', `accion_${componente.id}`);
+                        var inputAccion = document.createElement('input');
+                        inputAccion.type = 'text';
+                        inputAccion.name = `accion_${componente.id}`;
+                        inputAccion.id = `accion_${componente.id}`;
+                        inputAccion.classList.add('form-control');
+                        inputAccion.placeholder = 'Acción';
+                        divAccion.appendChild(labelAccion);
+                        divAccion.appendChild(inputAccion);
+                        divAccion.appendChild(id_);
+
+                        // Añadir las columnas de nombre, verbo y acción a la fila
+                        divComponente.appendChild(divNombre);
+                        divComponente.appendChild(divVerbo);
+                        divComponente.appendChild(divAccion);
+
+                        // Añadir la fila completa al contenedor de componentes
+                        componentesDiv.appendChild(divComponente);
+                    });
+                } else {
+                    componentesDiv.textContent = 'No hay componentes para este subsistema.';
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener los componentes:', error);
+            });
+    }
+}
+</script>
+
+<div class="col" style="margin-left: 30px;">
+    <div id="hoja">
+        <h2 class="section-title text-center"> Análisis Funcional</h2>
+        <h5 class="text-center" style="color: #013882;"> Para {{ nombre_equipo }} </h5>
+        <br>
+        <form id="analisis-funcional-form">
+            <input type="hidden" id="id_equipo_info" name="id_equipo_info" value="{{ id_equipo_info }}">
+            <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Sistema</label>
+                        <p>{{ sistema.nombre if sistema else 'No hay sistema seleccionado' }}</p>
+                        <input type="hidden" id="sistema" name="sistema" value="{{ sistema.id if sistema else '' }}">
+                    </div>
+                <div class="col-md-6">
+                    <label for="subsistema" class="form-label">Subsistema</label>
+                    <select class="form-control" id="subsistema" name="subsistema" onchange="cargarComponentes()">
+                        <option value="">Seleccione Subsistema</option>
+                        {% for subsistema in subsistemas %}
+                            <option value="{{ subsistema.id }}">{{ subsistema.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label for="verbo" class="form-label">Verbo</label>
+                    <input type="text" class="form-control" id="verbo" name="verbo" placeholder="Verbo">
+                </div>
+                <div class="col-md-6">
+                    <label for="accion" class="form-label">Acción</label>
+                    <input type="text" class="form-control" id="accion" name="accion" placeholder="Acción">
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <label for="estandar_desempeño" class="form-label">Estandar de desempeño</label>
+                    <textarea class="form-control" id="estandar_desempeño" name="estandar_desempeño" placeholder="estandar_desempeño"></textarea>
+                </div>
+            </div>
+            <br>
+            <h3>Componentes del Subsistema</h3>
+            <div id="componentes">
+
+            </div>
+            <div class="text-end mt-4">
+                <button class="btn btn-danger" onclick="window.history.back();">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btn-agregar-analisis-funcional">Guardar análisis funcional</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/analisis_funcional.js') }}"></script>
+
+{% endblock %}

@@ -17,5 +17,8 @@
 </style>
 {% endblock %}
 {%block content%}
-    <a class="terminar" href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" class="btn btn-primary1 Terminar">Terminar Repuestos</a>
+<a class="terminar" 
+   href="{% if from_url %}{{ from_url }}{% if '?' in from_url %}&from=modulo_repuestos{% else %}?from=modulo_repuestos{% endif %}{% else %}{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info) }}{% endif %}">
+   Terminar Repuestos
+</a>
 {% endblock %}

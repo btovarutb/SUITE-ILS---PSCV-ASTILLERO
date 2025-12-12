@@ -9,9 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
 
-{% block nombre %}LSA | Registro de FMEA{% endblock %}
-
-
 {% block body %}
 
 
@@ -26,6 +23,18 @@
             <input type="hidden" id="id_equipo_info" name="id_equipo_info" value="{{ id_equipo_info }}">
             <div class="row mt-3">
                 <div class="col-md-4">
+                    <label for="no_funcion" class="form-label">No. Función</label>
+                    <input type="text" class="form-control" id="no_funcion" name="no_funcion"
+                        value="{% if editar %}{{ fmea['no_funcion'] }}{% endif %}">
+                </div>
+            
+                <div class="col-md-4">
+                    <label for="funcion_activo" class="form-label">Función del Activo (F)</label>
+                    <input type="text" class="form-control" id="funcion_activo" name="funcion_activo"
+                        value="{% if editar %}{{ fmea['funcion_activo'] }}{% endif %}">
+                </div>
+
+                <div class="col-md-4">
                     <label for="subsistema" class="form-label">Subsistema</label>
     
                     {%if subsistema%}
@@ -38,8 +47,20 @@
                                 {% endfor %}  
                         </select>
                     {%endif%}  
-                </div>            
+                </div> 
     
+                <div class="col-md-4">
+                    <label for="falla_funcional" class="form-label">Falla Funcional (FF)</label>
+                    <input type="text" class="form-control" id="falla_funcional" name="falla_funcional"
+                        value="{% if editar %}{{ fmea['falla_funcional'] }}{% endif %}">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="descripcion_falla_funcional" class="form-label">Descripción Falla Funcional</label>
+                    <input type="text" class="form-control" id="descripcion_falla_funcional" name="descripcion_falla_funcional"
+                        value="{% if editar %}{{ fmea['descripcion_falla_funcional'] }}{% endif %}">
+                </div>
+
                 <div class="col-md-4">
                     <label for="item_componente" class="form-label">Item o componente</label>
                     {%if componente %}
@@ -56,10 +77,25 @@
                         </select>
                     {%endif%} 
                 </div>
+            </div>
+
+            <div class="row mt-3">
                 <div class="col-md-4">
-                    <label for="falla_funcional" class="form-label">Falla Funcional (FF)</label>
-                    <input type="text" class="form-control" id="falla_funcional" name="falla_funcional"
-                        value="{% if editar %}{{ fmea['falla_funcional'] }}{% endif %}">
+                    <label for="ref_elemento_tag" class="form-label">Ref. Elemento o Tag del Equipo</label>
+                    <input type="text" class="form-control" id="ref_elemento_tag" name="ref_elemento_tag"
+                        value="{% if editar %}{{ fmea['ref_elemento_tag'] }}{% endif %}">
+                </div>
+            
+                <div class="col-md-4">
+                    <label for="funcion_item_componente" class="form-label">Función del Item o Componente</label>
+                    <input type="text" class="form-control" id="funcion_item_componente" name="funcion_item_componente"
+                        value="{% if editar %}{{ fmea['funcion_item_componente'] }}{% endif %}">
+                </div>
+            
+                <div class="col-md-4">
+                    <label for="no_modo_falla" class="form-label">No. de Modo de Falla</label>
+                    <input type="text" class="form-control" id="no_modo_falla" name="no_modo_falla"
+                        value="{% if editar %}{{ fmea['no_modo_falla'] }}{% endif %}">
                 </div>
             </div>
     
@@ -89,7 +125,7 @@
                     </div>
                 </div>
     
-                <div class="col-md-4">
+                <div class="col-md-4 d-none">
                     <label for="consecutivo_modo_falla" class="form-label">Consecutivo de Modo de Falla</label>
                     <input type="text" class="form-control" id="consecutivo_modo_falla" name="consecutivo_modo_falla" readonly
                     value="{% if editar %}{{ fmea['consecutivo_modo_falla'] }}{% endif %}" readonly>
@@ -99,17 +135,17 @@
                       
                 </div>  
                 
-                <div class="col-md-2">
+                <div class="col-md-2 d-none">
                     <label for="mtbf" class="form-label">MTBF (en horas)</label>
                     <input type="number" class="form-control" id="mtbf" name="mtbf"
                         value="{% if editar %}{{ fmea['MTBF'] }}{% endif %}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 d-none">
                     <label for="mttr" class="form-label">MTTR (en horas)</label>
                     <input type="number" class="form-control" id="mttr" name="mttr"
                         value="{% if editar %}{{ fmea['MTTR'] }}{% endif %}">
                 </div>
-    
+
             </div>
             <div class="mt-3">
                 <label for="descripcion_modo_falla" class="form-label">Descripcion de Modo de Falla</label>
@@ -119,13 +155,25 @@
             </div>
     
             <div class="mt-3">
-                <label for="causas" class="form-label">Causas</label>
+                <label for="causas" class="form-label">Posibles Causas</label>
                 <textarea type="text" class="form-control" id="causas" name="causas" rows="4">
                     {% if editar %}{{ fmea['causa'] }}{% endif %}
                 </textarea>
             </div>
-    
+
             <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="no_efecto_falla" class="form-label">No. Efecto de Falla</label>
+                    <input type="text" class="form-control" id="no_efecto_falla" name="no_efecto_falla"
+                        value="{% if editar %}{{ fmea['no_efecto_falla'] }}{% endif %}">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="efecto_falla" class="form-label">Efecto de Falla</label>
+                    <input type="text" class="form-control" id="efecto_falla" name="efecto_falla"
+                        value="{% if editar %}{{ fmea['efecto_falla'] }}{% endif %}">
+                </div>
+
                 <div class="col-md-4">
                     <label for="mecanismo_falla" class="form-label">Mecanismo de Falla</label>
                     <select class="form-control" id="mecanismo_falla" name="mecanismo_falla" onchange="actualizarDetallesFalla()">
@@ -138,6 +186,9 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
+    
+            <div class="row mt-3">
     
                 <div class="col-md-4">
                     <label for="detalle_falla" class="form-label">Detalle de Falla</label>
@@ -162,7 +213,7 @@
             
             <div class="Severidad">
                 <hr>
-                <h3 class="section-title text-center">Severidad</h3>
+                <h3 class="section-title text-center mt-3">Severidad</h3>
                 <div class="row mt-3">
                     <div class="col-md-4">
                         <label for="consecuencia_severidad" class="form-label">Consecuencias de Severidad FO - Fallos
@@ -280,7 +331,7 @@
     
     <div class="Riesgo">
         <hr>
-        <h3 class="section-title text-center">Riesgo</h3>
+        <h3 class="section-title text-center mt-3">Riesgo</h3>
         <div class="row mt-3">
             <div class="col-md-4">
                 <label for="calculo_severidad" class="form-label">Cálculo de Severidad</label>
@@ -357,13 +408,22 @@
             </div>
         </div>
     </div>
+    
+    <div class="row mt-3">
+        <hr>
+        <div class="col-md-12 mt-3">
+            <label for="observaciones" class="form-label">Observaciones</label>
+            <textarea class="form-control" id="observaciones" name="observaciones" rows="2">{% if editar %}{{ fmea['observaciones'] }}{% endif %}</textarea>
+        </div>
+    </div>
+    
     <!-- Botón "Siguiente" que carga la siguiente vista -->
     <!-- Botón de envío -->
     <div class="text-end mt-4">
         <button class="btn btn-danger" onclick="window.history.back();">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Siguiente Modo de Falla</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
     </div>
-    </form>
+        </form>
 
     </div>
     </div>
@@ -384,17 +444,15 @@
 
                 // IDs de los campos requeridos
                 const requiredFields = [
-                    'subsistema',
-                    'item_componente',
+                    'no_funcion',
+                    'funcion_activo',
+                    'ref_elemento_tag',
+                    'funcion_item_componente',
+                    'no_modo_falla',
                     'falla_funcional',
                     'codigo_modo_falla',
-                    'nombre_modo_falla',
                     'descripcion_modo_falla',
                     'causas',
-                    'mecanismo_falla',
-                    'detalle_falla',
-                    'mtbf',
-                    'mttr',
                     'metodo_detecion_falla',
                     'fallo_oculto',
                     'seguridad_fisica',
@@ -406,44 +464,43 @@
                     'probabilidad_deteccion'
                 ];
 
-                let allFieldsFilled = true;
+                let emptyFields = [];
 
                 // Verificar cada campo requerido
-                for (let i = 0; i < requiredFields.length; i++) {
-                    const fieldId = requiredFields[i];
+                requiredFields.forEach(fieldId => {
                     const fieldElement = document.getElementById(fieldId);
 
                     if (fieldElement) {
+                        let isEmpty = false;
+                        
                         if (fieldElement.tagName === 'SELECT') {
-                            if (fieldElement.value === '' || fieldElement.value === null) {
-                                allFieldsFilled = false;
-                                break;
-                            }
+                            isEmpty = fieldElement.value === '' || fieldElement.value === null;
                         } else if (fieldElement.tagName === 'INPUT') {
-                            if (fieldElement.value.trim() === '') {
-                                allFieldsFilled = false;
-                                break;
-                            }
+                            isEmpty = fieldElement.value.trim() === '';
+                        }
+
+                        if (isEmpty) {
+                            emptyFields.push(fieldElement.getAttribute('name') || fieldId);
                         }
                     } else {
                         console.warn(`El elemento con ID "${fieldId}" no se encontró en el formulario.`);
                     }
-                }
+                });
 
-                if (!allFieldsFilled) {
+                if (emptyFields.length > 0) {
                     Swal.fire({
                         title: 'Campos vacíos',
-                        text: 'Por favor, complete todos los campos requeridos antes de continuar.',
+                        html: `Por favor, complete los siguientes campos antes de continuar:<br><strong>${emptyFields.join(', ')}</strong>`,
                         icon: 'warning',
                         confirmButtonText: 'Aceptar'
                     });
                 } else {
                     Swal.fire({
-                        title: '¿Deseas registrar este modo de falla?',
+                        title: '¿Deseas guardar/actualizar este modo de falla?',
                         text: "Verifica que todos los datos estén correctos antes de continuar.",
                         icon: 'question',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, registrar',
+                        confirmButtonText: 'Sí, guardar',
                         cancelButtonText: 'Cancelar',
                         confirmButtonColor: '#3085d6',
                         cancelButtonColor: '#d33'
@@ -457,5 +514,6 @@
         }
     });
 </script>
+
 
 {% endblock %}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotecmar || Equipo - FMEA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mostrar_RCM.css') }}">
+  </head>
+  <body>
+    <main>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+        <h2 class="section-title text-center">Failure Modes and Effects Analysis (FMEA)</h2>
+        <button data-url="{{ url_for('editar_FMEA_lista', id_equipo_info=id_equipo_info) }} "
+            data-section="section12" 
+            class="btn btn-primary no-print" 
+            style="padding: 8px 15px; border-radius: 10px;">
+          <i class="bi bi-pen" style="color: whitesmoke; font-size: 14px;"></i>
+        </button>
+      </div>
+      <button class="scroll-button left hidden scroll-left">◀</button>
+      <div class="scroll-container-horizontal">
+        <table class="table table-bordered ">
+          <thead>
+            <tr>
+                <th>#</th>
+                <th>No. Función</th>
+                <th>Función del activo (F)</th>
+                <th>Sistema</th>
+                <th>Falla Funcional (FF)</th>
+                <th>Descripción Falla Funcional Sistema</th>
+                <th>Item o Componente</th>
+                <th>Ref. Elemento o Tag del Equipo</th>
+                <th>Función del Item o Componente</th>
+                <th>No. de Modo de Falla</th>
+                <th>Modo de Falla</th>
+                <th>Posibles Causa</th>
+                <th>No. Efecto de Falla</th>
+                <th>Efecto de Falla</th>
+                <th>FO - Fallo Oculto (Valor)</th>
+                 <!--
+                <th>FO - Fallo Oculto (Descripción)</th>
+                -->
+                <th>SF - Seguridad Física (Valor)</th>
+                 <!--
+                <th>SF - Seguridad Física (Descripción)</th>
+                -->
+                <th>MA - Medio Ambiente (Valor)</th>
+                 <!--
+                <th>MA - Medio Ambiente (Descripción)</th>
+                -->
+                <th>IO - Impacto Operacional (Valor)</th>
+                 <!--
+                <th>IO - Impacto Operacional (Descripción)</th>
+                -->
+                <th>OR - Costos de Reparación (Valor)</th>
+                 <!--
+                <th>OR - Costos de Reparación (Descripción)</th>
+                -->
+                <th>FO - Flexibilidad Operacional (Valor)</th>
+                 <!--
+                <th>FO - Flexibilidad Operacional (Descripción)</th>
+                -->
+                <th>Cálculo de Severidad</th>
+                <th>Ocurrencia (Valor)</th>
+                 <!--
+                <th>Ocurrencia (Descripción)</th>
+                -->
+                <th>Probabilidad de Detección (Valor)</th>
+                 <!--
+                <th>Probabilidad de Detección (Descripción)</th>
+                -->
+                <th>RPN</th>
+                <th>Riesgo</th>
+                <th>Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for fmea in fmeas %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ fmea['no_funcion'] }}</td><!--No. función-->
+              <td>{{ fmea['funcion_activo'] }}</td><!--Función del activo-->
+              <td>{{ fmea['sistema'] }}</td>
+              <td>{{ fmea['falla_funcional'] }}</td>
+              <td>{{ fmea['descripcion_falla_funcional'] }}</td><!--Descripción Falla Funcional-->
+              <td>{{ fmea['componente'] }}</td>
+              <td>{{ fmea['ref_elemento_tag'] }}</td><!--Referencia del Elemento o Tag del Equipo-->
+              <td>{{ fmea['funcion_item_componente'] }}</td><!--Función del Item o Componente-->
+              <td>{{ fmea['no_modo_falla'] }}</td><!--No. de Modo de Falla-->
+              <td>{{ fmea['codigo_modo_falla'] }}</td>
+              <!--<td>{{ fmea['consecutivo_modo_falla'] }}</td>-->
+              <!--<td>{{ fmea['descripcion_modo_falla'] }}</td>-->
+              <td>{{ fmea['causa'] }}</td>
+              <!--
+              <td>{{ fmea['mecanismo_falla'] }}</td>
+              <td>{{ fmea['detalle_falla'] }}</td>
+              <td>{{ fmea['MTBF'] }}</td>
+              <td>{{ fmea['MTTR'] }}</td>
+              -->
+              <td>{{ fmea['no_efecto_falla'] }}</td><!--No. Efecto de Falla-->
+              <td>{{ fmea['efecto_falla'] }}</td><!--Efecto de Falla-->
+              <td>{{ fmea['fallo_oculto_valor'] }}</td>
+              <!--
+              <td>{{ fmea['fallo_oculto_descripcion'] }}</td>
+              -->
+              <td>{{ fmea['seguridad_fisica_valor'] }}</td>
+               <!--
+              <td>{{ fmea['seguridad_fisica_descripcion'] }}</td>
+              -->
+              <td>{{ fmea['medio_ambiente_valor'] }}</td>
+               <!--
+              <td>{{ fmea['medio_ambiente_descripcion'] }}</td>
+              -->
+              <td>{{ fmea['impacto_operacional_valor'] }}</td>
+               <!--
+              <td>{{ fmea['impacto_operacional_descripcion'] }}</td>
+              -->
+              <td>{{ fmea['costos_reparacion_valor'] }}</td>
+               <!--
+              <td>{{ fmea['costos_reparacion_descripcion'] }}</td>
+              -->
+              <td>{{ fmea['flexibilidad_operacional_valor'] }}</td>
+               <!--
+              <td>{{ fmea['flexibilidad_operacional_descripcion'] }}</td>
+              -->
+              <td>{{ fmea['calculo_severidad'] }}</td>
+              <td>{{ fmea['ocurrencia_valor'] }}</td>
+               <!--
+              <td>{{ fmea['ocurrencia_descripcion'] }}</td>
+              <td>{{ fmea['ocurrencia_mate'] }}</td>
+              -->
+              <td>{{ fmea['probabilidad_deteccion_valor'] }}</td>
+               <!--
+              <td>{{ fmea['probabilidad_deteccion_descripcion'] }}</td>
+              -->
+              <td>{{ fmea['RPN']}}</td>
+              <td>{{ fmea['nombre_riesgo']}}</td>
+              <td>{{ fmea['observaciones'] }}</td><!--Observaciones-->
+            </tr>
+            {% endfor %}
+          </tbody>        
+        </table>
+      </div>
+      <button class="scroll-button right scroll-right">▶</button>
+    </main>
+  </body>
+</html>
+
+

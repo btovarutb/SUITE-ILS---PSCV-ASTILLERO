@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentGroupId = null;
     let currentSubgroupId = null;
     let currentSystemId = null;
+    let navigationStack = []; 
 
     const currentBuqueId = document.getElementById('currentBuqueId')?.getAttribute('data-value');
     console.log(currentBuqueId);
@@ -36,10 +37,18 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             return;
         }
-
+    
+        // ✅ Guardar el estado actual antes de buscar
+        navigationStack.push({
+            view: currentView,
+            groupId: currentGroupId,
+            subgroupId: currentSubgroupId,
+            systemId: currentSystemId
+        });
+    
         let apiUrl = '';
         let type = '';
-
+    
         if (currentView === 'grupo') {
             apiUrl = `${apiBaseUrl}?busqueda=${encodeURIComponent(query)}`;
             type = 'equipo';
@@ -53,8 +62,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 return;
             }
-            apiUrl = `${apiBaseUrl}/buscar_subgrupos?busqueda=${encodeURIComponent(query)}&id_grupo=${currentGroupId}`;
-            type = 'subgrupo';
+            apiUrl = `/api/buscar_subgrupos?busqueda=${encodeURIComponent(query)}&id_grupo=${currentGroupId}`;
+            type = 'subgrupo';  // ✅ mantiene el estilo correcto
         } else if (currentView === 'sistema') {
             if (!currentSubgroupId) {
                 Swal.fire({
@@ -65,8 +74,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 return;
             }
-            apiUrl = `${apiBaseUrl}/buscar_sistemas?busqueda=${encodeURIComponent(query)}&id_subgrupo=${currentSubgroupId}`;
-            type = 'sistema';
+            apiUrl = `/api/buscar_sistemas?busqueda=${encodeURIComponent(query)}&id_subgrupo=${currentSubgroupId}`;
+            type = 'sistema';  // ✅ mantiene el estilo correcto
         } else if (currentView === 'equipo') {
             if (isDetailedContext && !currentSystemId) {
                 Swal.fire({
@@ -82,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 : `${apiBaseUrl}?busqueda=${encodeURIComponent(query)}`;
             type = 'equipo';
         }
-
+    
         fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {
@@ -100,10 +109,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         card.classList.add('card', 'dynamic-card');
                         card.setAttribute('data-id', item.id);
                         card.setAttribute('data-type', type);
-                        card.innerHTML = `<p>${item.nombre_equipo || item.nombre || 'Nombre no disponible'}</p>`;
+                    
+                        if (type === 'subgrupo' || type === 'sistema') {
+                            card.innerHTML = `<h1>${item.numeracion}</h1><p class="grupo subgrupo-style">${item.nombre}</p>`;
+                        } else if (type === 'equipo') {
+                            card.classList.add('centered-content');
+                            const nombreEquipo = item.nombre_equipo || item.nombre || item.equipo || 'Nombre no disponible';
+                            card.innerHTML = `<p>${nombreEquipo}</p>`;
+                        } else {
+                            card.innerHTML = `<p>${item.nombre || 'Nombre no disponible'}</p>`;
+                        }
+                    
                         resultados.appendChild(card);
-                    });
+                    });                    
                 }
+                volverBtn.classList.remove('d-none'); // ✅ Mostrar botón volver tras búsqueda
             })
             .catch(error => {
                 Swal.fire({
@@ -115,6 +135,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error en la búsqueda:', error);
             });
     }
+
+    if (isDetailedContext) {
+        const tarjetas = resultados.querySelectorAll('.card_equipos');
+
+        searchbox.addEventListener('input', function () {
+            const filtro = searchbox.value.trim().toLowerCase();
+            let hayResultados = false;
+
+            tarjetas.forEach(card => {
+                const texto = card.textContent.toLowerCase();
+                const coincide = texto.includes(filtro);
+                card.style.display = coincide ? 'block' : 'none';
+                if (coincide) hayResultados = true;
+            });
+
+            const mensajeNoResultados = document.getElementById('mensaje-no-resultados');
+            if (!hayResultados && filtro.length > 0) {
+                if (!mensajeNoResultados) {
+                    const p = document.createElement('p');
+                    p.id = 'mensaje-no-resultados';
+                    p.textContent = 'No se encontraron resultados.';
+                    resultados.appendChild(p);
+                }
+            } else {
+                const p = document.getElementById('mensaje-no-resultados');
+                if (p) p.remove();
+            }
+
+            // Si el input está vacío, mostrar todos
+            if (filtro === '') {
+                tarjetas.forEach(card => card.style.display = 'block');
+            }
+        });
+    }
+
 
     // Asignación de eventos condicionalmente
     if (buscarBtnBuque) {
@@ -168,73 +223,96 @@ document.addEventListener('DOMContentLoaded', function () {
                     .catch(error => console.error('Error:', error));
                     
             } else if (type === 'equipo') {
-                const nombre_equipo = card.querySelector('p').textContent.trim(); // Obtener el nombre del equipo desde la tarjeta
+                const textElement = card.querySelector('h1') || card.querySelector('p');
                 
-                // Hacer una petición POST al backend para mostrar la información del equipo
-                fetch('/LSA/mostrar-general', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ nombre_equipo: nombre_equipo }) // Enviar nombre_equipo al backend
-                })
-                .then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url; // Seguir la redirección del backend
-                    } else {
-                        console.error('Error en la redirección');
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error en la redirección',
-                        text: 'Hubo un error al procesar la redirección. Inténtalo de nuevo más tarde.',
-                        confirmButtonText: 'OK'
+                if (textElement) {
+                    const nombre_equipo = textElement.textContent.trim(); // 🔥 ESTO FALTABA 🔥
+            
+                    fetch('/LSA/mostrar-general', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ nombre_equipo: nombre_equipo }) // ahora sí existe
+                    })
+                    .then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            console.error('Error en la redirección');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error en la redirección',
+                            text: 'Hubo un error al procesar la redirección. Inténtalo de nuevo más tarde.',
+                            confirmButtonText: 'OK'
+                        });
+                        console.error('Error en la petición POST:', error);
                     });
-                    console.error('Error en la petición POST:', error);
-                });
+            
+                } else {
+                    console.error('No se encontró el <h1> ni el <p> dentro de la tarjeta de equipo.');
+                }
             }
         }
     });
 
-    function mostrarTarjetas(data, type) {
-        resultados.innerHTML = ''; // Limpiar los resultados anteriores
-    
-        data.forEach(item => {
-            let card = document.createElement('div');
-            card.classList.add('card');
-    
-            card.setAttribute('data-id', item.id);
-            card.setAttribute('data-type', type);
-    
-            if (type === 'grupo') {
-                card.classList.add('card');
-                let imageSrc = item.numeracion == 200 ? 'img/1.png' :
-                               item.numeracion == 300 ? 'img/2.png' :
-                               item.numeracion == 400 ? 'img/3.png' :
-                               item.numeracion == 500 ? 'img/4.png' :
-                               item.numeracion == 600 ? 'img/5.png' : 'img/6.png';
-                card.innerHTML = `<img src="/static/${imageSrc}" alt="Grupo"><p class="grupo">${item.nombre}</p>`;
-            } else if (type === 'subgrupo' || type === 'sistema') {
-                card.classList.add('dynamic-card');
-                card.innerHTML = `<h1>${item.numeracion}</h1><p class="grupo subgrupo-style">${item.nombre}</p>`;
-            } else if (type === 'equipo') {
-                card.classList.add('dynamic-card');
-                const nombreEquipo = item.nombre_equipo || item.nombre || item.equipo || 'Nombre no disponible';
-                card.innerHTML = `<p>${nombreEquipo}</p>`;
-            }
-    
-            resultados.appendChild(card);
-        });
-    
-        currentView = type;
-        actualizarPlaceholder();
-        // Actualizar el botón de volver y los filtros
+function mostrarTarjetas(data, type) {
+    resultados.innerHTML = '';
 
-        // Mostrar o esconder botón de volver
-        volverBtn.classList.toggle('d-none', currentView === 'grupo');
+    // Guardar el nivel actual en la pila si está cambiando a uno nuevo
+    if (currentView !== type) {
+        navigationStack.push({
+            view: currentView,
+            groupId: currentGroupId,
+            subgroupId: currentSubgroupId,
+            systemId: currentSystemId
+        });
     }
+
+    data.forEach(item => {
+        let card = document.createElement('div');
+        card.classList.add('card');
+        card.setAttribute('data-id', item.id);
+        card.setAttribute('data-type', type);
+
+        if (type === 'grupo') {
+            let imageSrc = 'img/8.png';
+            let altText = 'Imagen por defecto';
+            switch (item.numeracion) {
+                case 100: imageSrc = 'img/1.png'; altText = 'Planta Eléctrica'; break;
+                case 200: imageSrc = 'img/2.png'; altText = 'Planta de Propulsión'; break;
+                case 300: imageSrc = 'img/3.png'; altText = 'Planta Eléctrica'; break;
+                case 400: imageSrc = 'img/4.png'; altText = 'Sistemas Auxiliares'; break;
+                case 500: imageSrc = 'img/5.png'; altText = 'Sistemas de Navegación'; break;
+                case 600: imageSrc = 'img/6.png'; altText = 'Sistemas de Armamento'; break;
+                case 700: imageSrc = 'img/7.png'; altText = 'Sistemas de Armamento'; break;
+            }
+
+            card.innerHTML = `
+                <img src="/static/${imageSrc}" alt="${altText}">
+                <div class="overlay-text">${item.numeracion}</div>
+                <p class="grupo">${item.nombre}</p>
+            `;
+        } else if (type === 'subgrupo' || type === 'sistema') {
+            card.classList.add('dynamic-card');
+            card.innerHTML = `<h1>${item.numeracion}</h1><p class="grupo subgrupo-style">${item.nombre}</p>`;
+        } else if (type === 'equipo') {
+            card.classList.add('dynamic-card', 'centered-content');
+            const nombreEquipo = item.nombre_equipo || item.nombre || item.equipo || 'Nombre no disponible';
+            card.innerHTML = `<p>${nombreEquipo}</p>`;
+        }
+
+        resultados.appendChild(card);
+    });
+
+    currentView = type;
+    actualizarPlaceholder();
+    volverBtn.classList.toggle('d-none', currentView === 'grupo');
+}
+
     
 
     // Función para actualizar el placeholder del buscador
@@ -252,32 +330,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Manejar el botón de volver
     volverBtn.addEventListener('click', function () {
-        if (currentView === 'subgrupo') {
-            currentView = 'grupo';
-            currentSubgroupId = null;
-            currentSystemId = null;
-
-            fetch(`/api/grupos`)
+        if (navigationStack.length > 0) {
+            const lastState = navigationStack.pop();
+    
+            currentView = lastState.view;
+            currentGroupId = lastState.groupId;
+            currentSubgroupId = lastState.subgroupId;
+            currentSystemId = lastState.systemId;
+    
+            let url = '';
+            let type = '';
+    
+            if (currentView === 'grupo') {
+                url = `/api/grupos`;
+                type = 'grupo';
+            } else if (currentView === 'subgrupo') {
+                url = `/api/subgrupos/${currentGroupId}`;
+                type = 'subgrupo';
+            } else if (currentView === 'sistema') {
+                url = `/api/sistemas/${currentSubgroupId}`;
+                type = 'sistema';
+            } else if (currentView === 'equipo') {
+                url = `/api/equipos/${currentSystemId}`;
+                type = 'equipo';
+            }
+    
+            fetch(url)
                 .then(response => response.json())
-                .then(data => mostrarTarjetas(data, 'grupo'))
+                .then(data => mostrarTarjetas(data, type))
                 .catch(error => console.error('Error:', error));
-        } else if (currentView === 'sistema') {
-            currentView = 'subgrupo';
-            currentSystemId = null;
-
-            fetch(`/api/subgrupos/${currentGroupId}`)
-                .then(response => response.json())
-                .then(data => mostrarTarjetas(data, 'subgrupo'))
-                .catch(error => console.error('Error:', error));
-        } else if (currentView === 'equipo') {
-            currentView = 'sistema';
-
-            fetch(`/api/sistemas/${currentSubgroupId}`)
-                .then(response => response.json())
-                .then(data => mostrarTarjetas(data, 'sistema'))
-                .catch(error => console.error('Error:', error));
+        } else {
+            volverBtn.classList.add('d-none');
         }
-
-        actualizarPlaceholder();
+    
+        searchbox.value = ''; // ✅ Limpiar el input de búsqueda
     });
+    
+    
 });
+
+

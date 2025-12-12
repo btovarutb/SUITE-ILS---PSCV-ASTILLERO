@@ -118,6 +118,7 @@ function cargarEquipo(equipoId) {
     }
 
     if (equipoButton) {
+        console.log(equipoButton)
         try {
             // Obtener los datos FUA_FR del atributo data-fua-fr
             const fuaFrData = JSON.parse(equipoButton.getAttribute('data-fua-fr')) || {};
@@ -269,12 +270,14 @@ function guardarFuaFr() {
     });
 
     // Guardar el resultado del cálculo de FUA en su propia clave
-    const resultadoFuaInput = document.getElementById('resultado-fua'); // Campo readonly del resultado
-    if (resultadoFuaInput) {
-        AOR = resultadoFuaInput.value; // Guardar el valor del campo readonly
+    const resultadoFuaInput = document.getElementById('resultado-fua'); 
+    let AOR = null;
+    if (resultadoFuaInput && resultadoFuaInput.value.trim() !== '') {
+        AOR = parseFloat(resultadoFuaInput.value);
     }
 
     const dataTosend = { data, AOR }
+    console.log(dataTosend)
 
     // Llamar a la API para guardar los datos en la base de datos
     fetch(`/api/equipos/${selectedEquipoId}/fua_fr`, {
@@ -290,37 +293,5 @@ function guardarFuaFr() {
 }
 
 
-
-function cargarFuaFr(equipoId) {
-    fetch(`/api/equipos/${equipoId}/fua_fr`)
-    .then(response => response.json())
-    .then(result => {
-        if (result.fua_fr) {
-            // Cargar los datos en el formulario
-            Object.entries(result.fua_fr.FUA).forEach(([key, value]) => {
-                const input = document.querySelector(`#section1 [name="${key}"], #section1 [id="${key}"]`);
-                if (input) {
-                    if (input.type === "number") {
-                        input.value = value.porcentaje || "";
-                    } else {
-                        input.value = value.descripcion || "";
-                    }
-                }
-            });
-
-            Object.entries(result.fua_fr.FR).forEach(([key, value]) => {
-                const input = document.querySelector(`#section2 [name="${key}"], #section2 [id="${key}"]`);
-                if (input) {
-                    if (input.type === "number") {
-                        input.value = value.porcentaje || "";
-                    } else {
-                        input.value = value.descripcion || "";
-                    }
-                }
-            });
-        }
-    })
-    .catch(error => console.error('Error al cargar FUA_FR:', error));
-}
 
 

@@ -1,6 +1,6 @@
 {% extends './base.html' %}
 
-{% block nombre %}LSA{% endblock %}
+{% block title %}Desglose general{% endblock %}
 {% block body %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/desglose.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fondo.css') }}">
@@ -17,7 +17,7 @@
                 <p style="text-transform: uppercase;">Desglose general para todos los buques</p>
             </div>
 
-            <div style="display: flex; gap: 1rem;">
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; font-size: 14px;">
                 <div class="search-container">
                     <input type="text" id="searchbox" placeholder="Buscar equipos">
                     <button id="buscarBtnGeneral">
@@ -38,18 +38,22 @@
             {% for grupo in grupos %}
             <div class="card" data-id="{{ grupo.id }}" data-type="grupo">
                 <!-- Mostrar imagen según el valor de numeracion -->
-                {% if grupo.numeracion == 200 %}
-                    <img src="{{ url_for('static', filename='img/1.png') }}" alt="Planta de Propulsión">
+                {% if grupo.numeracion == 100 %}
+                    <img src="{{ url_for('static', filename='img/1.png') }}" alt="Planta Eléctrica">
+                {% elif grupo.numeracion == 200 %}
+                    <img src="{{ url_for('static', filename='img/2.png') }}" alt="Planta de Propulsión">
                 {% elif grupo.numeracion == 300 %}
-                    <img src="{{ url_for('static', filename='img/2.png') }}" alt="Planta Eléctrica">
+                    <img src="{{ url_for('static', filename='img/3.png') }}" alt="Planta Eléctrica">
                 {% elif grupo.numeracion == 400 %}
-                    <img src="{{ url_for('static', filename='img/3.png') }}" alt="Sistemas Auxiliares">
+                    <img src="{{ url_for('static', filename='img/4.png') }}" alt="Sistemas Auxiliares">
                 {% elif grupo.numeracion == 500 %}
-                    <img src="{{ url_for('static', filename='img/4.png') }}" alt="Sistemas de Navegación">
+                    <img src="{{ url_for('static', filename='img/5.png') }}" alt="Sistemas de Navegación">
                 {% elif grupo.numeracion == 600 %}
-                    <img src="{{ url_for('static', filename='img/5.png') }}" alt="Sistemas de Armamento">
+                    <img src="{{ url_for('static', filename='img/6.png') }}" alt="Sistemas de Armamento">
+                {% elif grupo.numeracion == 700 %}
+                    <img src="{{ url_for('static', filename='img/7.png') }}" alt="Sistemas de Armamento">
                 {% else %}
-                    <img src="{{ url_for('static', filename='img/6.png') }}" alt="Imagen por defecto">
+                    <img src="{{ url_for('static', filename='img/8.png') }}" alt="Imagen por defecto">
                 {% endif %}
                 <div class="overlay-text">{{ grupo.numeracion }}</div>
                 <!-- Mostrar número y nombre -->

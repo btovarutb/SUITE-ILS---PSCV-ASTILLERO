@@ -127,3 +127,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.ver-imagen').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const src = this.getAttribute('data-imagen');
+        const imgModal = document.getElementById('imagenModal');
+        imgModal.src = src;
+        const modal = new bootstrap.Modal(document.getElementById('modalImagen'));
+        modal.show();
+      });
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.open-modal').forEach(el => {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        const src = this.getAttribute('data-img');
+        const modalImg = document.getElementById('imagenModal');
+        modalImg.src = src;
+        const modal = new bootstrap.Modal(document.getElementById('modalImagen'));
+        modal.show();
+      });
+    });
+  });

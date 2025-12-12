@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("[scroll.js] Cargado correctamente ✅");
     // Selecciona todos los contenedores de scroll y configura el scroll para cada uno
     const scrollContainers = document.querySelectorAll('.scroll-container-horizontal');
+    console.log(scrollContainers)
 
     scrollContainers.forEach((scrollContainer) => {
         // Encuentra los botones de desplazamiento asociados al contenedor actual

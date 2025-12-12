@@ -34,9 +34,7 @@
     <div class="tab-content" id="myTabContent">
       <!-- Pestaña de "Análisis de herramientas" -->
       <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-        <br>
-        <h3>Herramientas Generales</h3>
-        <table class="table table-bordered">
+        <table class="table">
           <thead>
             <tr>
               <th scope="col">Nombre de la herramienta</th>
@@ -55,8 +53,18 @@
               <td>{{ analisis.parte_numero }}</td>
               <td>
                 {% if analisis.dibujo_seccion_transversal %}
-                <img src="data:image/png;base64,{{ analisis.dibujo_seccion_transversal|b64encode }}" alt="Dibujo" style="max-width: 100px; max-height: 100px;">
+                {% set img64 = analisis.dibujo_seccion_transversal|b64encode %}
+                {% set mime = img64[:5] %}
+                {% if mime in ['iVBOR', '/9j/4'] %}
+                  <button type="button" class="btn btn-link open-modal" data-img="data:image/png;base64,{{ img64 }}">
+                    Ver imagen
+                  </button>
+                {% else %}
+                  <span class="text-muted">Imagen no disponible</span>
                 {% endif %}
+              {% else %}
+                <span class="text-muted">Sin imagen</span>
+              {% endif %}              
               </td>
               <td>{{ analisis.cantidad }}</td>
 
@@ -69,9 +77,7 @@
 
       <!-- Pestaña de "Herramientas especiales" -->
       <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-        <br>
-        <h3>Herramientas Especiales</h3>
-        <table class="table table-bordered">
+        <table class="table">
           <thead>
             <tr>
               <th scope="col">Nombre de la herramienta</th>
@@ -89,8 +95,17 @@
               <td>{{ herramienta.parte_numero }}</td>
               <td>
                 {% if herramienta.dibujo_seccion_transversal %}
-
-                <img src="data:image/png;base64,{{ herramienta.dibujo_seccion_transversal|b64encode }}" alt="Dibujo" style="max-width: 100px; max-height: 100px;" class="herramientas">
+                  {% set img64 = herramienta.dibujo_seccion_transversal|b64encode %}
+                  {% set mime = img64[:5] %}
+                  {% if mime in ['iVBOR', '/9j/4'] %}
+                    <button type="button" class="btn btn-link open-modal" data-img="data:image/png;base64,{{ img64 }}">
+                      Ver imagen
+                    </button>
+                  {% else %}
+                    <span class="text-muted">Imagen no disponible</span>
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">Sin imagen</span>
                 {% endif %}
               </td>
               <td>{{ herramienta.cantidad }}</td>
@@ -99,6 +114,19 @@
             {% endfor %}
           </tbody>
       </table>
+    </div>
+    <!-- Modal de Imagen -->
+    <div class="modal fade" id="modalImagen" tabindex="-1" aria-labelledby="modalImagenLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img id="imagenModal" class="img-fluid rounded" style="max-width: 90%; max-height: 80vh;" alt="Imagen no disponible">
+          </div>
+        </div>
+      </div>
     </div>
     <script src="{{ url_for('static', filename='js/mostrar_herramientas.js') }}"></script>
   </main>

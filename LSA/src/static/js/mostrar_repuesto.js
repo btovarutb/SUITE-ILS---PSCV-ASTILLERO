@@ -80,3 +80,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });    
 });
+
+// Delegación de eventos para abrir imagen en modal
+document.addEventListener('click', function(e) {
+    const trigger = e.target.closest && e.target.closest('.ver-imagen');
+    if (!trigger) return;
+    const imgSrc = trigger.getAttribute('data-imagen');
+    const imgEl = document.getElementById('imagenModal');
+    if (imgEl) imgEl.src = imgSrc || '';
+});
+
+// Limpiar la imagen cuando el modal se cierra (evita mostrar imagen previa)
+var modalEl = document.getElementById('modalImagen');
+if (modalEl) {
+    modalEl.addEventListener('hidden.bs.modal', function () {
+        var img = document.getElementById('imagenModal');
+        if (img) img.src = '';
+    });
+}

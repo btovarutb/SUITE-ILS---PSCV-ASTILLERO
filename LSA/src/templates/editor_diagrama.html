@@ -1,0 +1,247 @@
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon" />
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor de Diagrama</title>
+  <style>
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Inter', sans-serif !important;
+}
+
+#titulo-diagrama {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 24px; /* 38px visibles + 4px que pisan el iframe */
+  background-color: #1868db;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  z-index: 10;
+  margin: 0;
+  font-weight: bold;
+  padding-left: 1.4rem;
+  padding-top: 10px;
+}
+
+iframe {
+  position: absolute;
+  top: 28px; /* Solo 38px para que el título pise 4px */
+  left: 0;
+  width: 100%;
+  height: calc(100% - 38px);
+  border: none;
+}
+
+</style>
+</head>
+<body>
+  <h4 id="titulo-diagrama">
+    Edición diagrama {{ tipo.replace('_', ' ') }} del equipo {{ nombre_equipo }}
+  </h4>
+ <iframe
+  id="drawio-frame"
+  src="https://embed.diagrams.net/?embed=1&proto=json&spin=1&libs=general;flowchart;uml&ui=atlas&saveAndExit=0&modified=0"
+  frameborder="0"
+  style="width:100%; height:90vh;"
+></iframe>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const iframe = document.getElementById("drawio-frame");
+  const urlParams = new URLSearchParams(window.location.search);
+  const equipoId = urlParams.get("equipo_id");
+  const tipo = urlParams.get("tipo");
+  const fromUrl = urlParams.get("from_url");
+  function safeDecodeURIComponent(value) {
+    if (!value) return '';
+    try {
+      return decodeURIComponent(value);
+    } catch (e) {
+      // If decodeURIComponent fails (malformed URI), try to repair common issues:
+      //  - stray '%' not followed by two hex digits
+      //  - convert pluses to spaces (in some encodings)
+      try {
+        const repaired = value
+          .replace(/\+/g, ' ')
+          .replace(/%(?![0-9A-Fa-f]{2})/g, '%25');
+        return decodeURIComponent(repaired);
+      } catch (e2) {
+        // Last resort: return the raw value so the page still loads (diagram may be missing)
+        console.warn('safeDecodeURIComponent: failed to decode xml_diagrama', e, e2);
+        return value;
+      }
+    }
+  }
+
+  const xmlDiagrama = safeDecodeURIComponent(urlParams.get("xml_diagrama") || '');
+  let currentXml = null;
+  let modoGuardado = null;
+  let salirDespuesGuardar = false;
+
+  iframe.addEventListener("load", () => {
+    let intentos = 0;
+    const maxIntentos = 20;
+
+    const intervalId = setInterval(() => {
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+        // Reemplazar logo
+        const logo = iframeDoc?.querySelector(".geSmallAppIcon");
+        if (logo) {
+          logo.src = "/static/img/CotecmarLogo.png";
+          logo.alt = "COTECMAR";
+          logo.width = 33;
+          logo.height = 38;
+        }
+
+        // Ocultar botón "Guardar y salir"
+        const botones = iframeDoc?.querySelectorAll("div.geMenubar a");
+        botones?.forEach((btn) => {
+          if (btn.innerText.trim().toLowerCase().includes("guardar y salir")) {
+            btn.style.display = "none";
+          }
+        });
+
+        if (++intentos >= maxIntentos) clearInterval(intervalId);
+      } catch (e) {
+        clearInterval(intervalId);
+      }
+    }, 200);
+  });
+
+  window.addEventListener("message", (event) => {
+    if (!event.data || typeof event.data !== "string") return;
+
+    try {
+      const msg = JSON.parse(event.data);
+      if (!msg.event) return;
+
+      if (msg.event === "init") {
+        iframe.contentWindow.postMessage(JSON.stringify({
+          action: "load",
+          autosave: 1,
+          modified: 0,
+          xml: xmlDiagrama || null
+        }), "*");
+      }
+
+      if (msg.event === "save") {
+        currentXml = msg.xml || msg.data?.xml;
+        salirDespuesGuardar = msg.exit === true || modoGuardado === 'guardar_salir';
+
+        iframe.contentWindow.postMessage(JSON.stringify({
+          action: "export",
+          format: "xmlpng",
+          spinKey: "saving"
+        }), "*");
+      }
+
+      if (msg.event === "export") {
+        const imagenBase64 = msg.data;
+        if (!imagenBase64 || !imagenBase64.startsWith("data:image")) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Exportación fallida',
+            text: 'No se pudo generar la imagen PNG desde el diagrama.'
+          });
+          return;
+        }
+
+        fetch(`/api/guardar-diagrama/${equipoId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tipo: tipo,
+            xml: currentXml,
+            imagen: imagenBase64
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            iframe.contentWindow.postMessage(JSON.stringify({
+              action: "status",
+              modified: false,
+              message: "Guardado"
+            }), "*");
+
+            if (salirDespuesGuardar) {
+              if (fromUrl) {
+                window.location.href = fromUrl;
+              } else {
+                history.back();
+              }
+            } else {
+              Swal.fire({
+                icon: 'success',
+                title: 'Guardado correctamente',
+                text: 'El diagrama se ha guardado exitosamente.',
+                confirmButtonColor: '#003366'
+              });
+            }
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al guardar',
+              text: 'No se pudo guardar el diagrama en el servidor.'
+            });
+          }
+        });
+      }
+
+      if (msg.event === "exit") {
+        // Siempre redirigir al salir
+        if (fromUrl) {
+          window.location.href = fromUrl;
+        } else {
+          history.back();
+        }
+      }
+
+    } catch (e) {
+      console.warn("⚠️ Error procesando mensaje del iframe:", e);
+    }
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.key === "s") {
+      e.preventDefault();
+      guardarDiagrama("guardar");
+    }
+  });
+
+  function guardarDiagrama(modo = "guardar") {
+    modoGuardado = modo;
+    salirDespuesGuardar = (modo === "guardar_salir");
+    iframe.contentWindow.postMessage(JSON.stringify({ action: "save" }), "*");
+  }
+
+  function salirEditor() {
+    modoGuardado = "salir";
+    salirDespuesGuardar = false;
+    iframe.contentWindow.postMessage(JSON.stringify({ action: "exit" }), "*");
+  }
+
+  window.guardarDiagrama = guardarDiagrama;
+  window.salirEditor = salirEditor;
+</script>
+
+
+
+</body>
+</html>

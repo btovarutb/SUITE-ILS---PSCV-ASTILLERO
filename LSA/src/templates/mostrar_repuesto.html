@@ -8,8 +8,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/FMEA.css') }}">
 {% endblock %}
 
-{% block nombre %}LSA | Repuestos{% endblock %}
-
 {% block body %}
 <div class="container" id="reporte" >
   <div class="row toolBar">
@@ -21,8 +19,8 @@
         <div class="buttons" style="display: flex; gap: 10px;">
             <a href="{{ url_for('registro_repuesto',id_equipo_info=id_equipo_info) }}" 
                class="btn btn-primary">Agregar repuesto</a>
-            <a href="{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info, token=session['token']) }}" 
-               class="btn btn-secondary">Cerrar modulo</a>
+            <a href="{% if from_url %}{{ from_url }}{% if '?' in from_url %}&from=modulo_repuestos{% else %}?from=modulo_repuestos{% endif %}{% else %}{{ url_for('mostrar_general_page', id_equipo_info=id_equipo_info) }}{% endif %}">
+                Cerrar módulo </a>
         </div>                
     </div>
   </div>
@@ -47,7 +45,17 @@
             <td>{{ repuesto.valor }}</td>
             <td>
               {% if repuesto.dibujo_transversal %}
-                  <img src="data:image/png;base64,{{ repuesto.dibujo_transversal|b64encode }}" alt="Dibujo" style="max-width: 100px; max-height: 100px;">
+                  {% set imagen_base64 = repuesto.dibujo_transversal|b64encode %}
+                  {% set mime_prefix = imagen_base64[:5] %}
+                  {% if mime_prefix in ['iVBOR', '/9j/4'] %}
+                    <button type="button" class="btn btn-link ver-imagen" data-bs-toggle="modal" data-bs-target="#modalImagen" data-imagen="data:image/png;base64,{{ imagen_base64 }}">
+                      Ver imagen
+                    </button>
+                  {% else %}
+                    <span class="text-muted">Imagen no disponible</span>
+                  {% endif %}
+              {% else %}
+                <span class="text-muted">Sin imagen</span>
               {% endif %}
             </td>
             <td>{{ repuesto.mtbf }}</td>
@@ -66,4 +74,18 @@
     </table>
   </div>
 </div>
+
+  <!-- Modal de Imagen (reutiliza el mismo id usado en otras vistas) -->
+  <div class="modal fade" id="modalImagen" tabindex="-1" aria-labelledby="modalImagenLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="imagenModal" class="img-fluid rounded" style="max-width: 90%; max-height: 80vh;" alt="Imagen no disponible">
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

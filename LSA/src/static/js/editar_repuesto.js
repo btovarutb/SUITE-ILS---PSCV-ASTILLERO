@@ -123,27 +123,27 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
-
-    // Función redirigir según URL anterior
-    function redirigirSegunURLAnterior() {
-        const urlAnterior = document.referrer; // URL previa
-        const idEquipoInfo = document.getElementById('id_equipo_info')?.value;
-
-        if (!idEquipoInfo) {
-            Swal.fire({
-                title: 'Error',
-                text: 'El ID del equipo no está disponible. Por favor, verifica.',
-                icon: 'warning',
-                confirmButtonText: 'OK',
-            });
-            window.location.href = '/LSA';
-            return;
-        }
-
-        if (urlAnterior.includes('/LSA/mostrar-repuesto-ext')) {
-            window.location.href = `/LSA/mostrar-repuesto-ext?id_equipo_info=${idEquipoInfo}`;
-        } else {
-            window.location.href = `/LSA/mostrar-repuesto`;
-        }
-    }
 });
+
+// Función redirigir según URL anterior
+function redirigirSegunURLAnterior() {
+    const urlAnterior = document.referrer; // URL previa
+    const idEquipoInfo = document.getElementById('id_equipo_info')?.value;
+
+    if (!idEquipoInfo) {
+        Swal.fire({
+            title: 'Error',
+            text: 'El ID del equipo no está disponible. Por favor, verifica.',
+            icon: 'warning',
+            confirmButtonText: 'OK',
+        });
+        window.location.href = '/LSA';
+        return;
+    }
+
+    if (urlAnterior.includes('/LSA/mostrar-repuesto-ext')) {
+        window.location.href = `/LSA/mostrar-repuesto-ext?id_equipo_info=${idEquipoInfo}`;
+    } else {
+        window.location.href = `/LSA/mostrar-repuesto`;
+    }
+}

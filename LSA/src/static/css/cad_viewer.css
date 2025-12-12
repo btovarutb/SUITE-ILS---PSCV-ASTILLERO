@@ -1,0 +1,555 @@
+/* CAD Viewer Styles */
+
+/* Asegurar que la sección CAD use todo el ancho disponible */
+#section13 {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+}
+
+#section13 .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+}
+
+#section13 .col-12 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+#cad-viewer-container {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.upload-zone {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.cad-section {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.cad-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.cad-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2a5298;
+    margin: 0;
+}
+
+.cad-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-cad {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-cad:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-upload {
+    background: #28a745;
+    color: white;
+}
+
+.btn-upload:hover {
+    background: #218838;
+}
+
+.btn-select {
+    background: #007bff;
+    color: white;
+}
+
+.btn-select:hover {
+    background: #0056b3;
+}
+
+.btn-download {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-download:hover {
+    background: #138496;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+.btn-viewer {
+    background: #6f42c1;
+    color: white;
+}
+
+.btn-viewer:hover {
+    background: #5a32a3;
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+/* Información del archivo actual */
+.archivo-actual-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.archivo-actual-card h5 {
+    color: #2a5298;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.archivo-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.archivo-actions {
+    border-top: 1px solid #e9ecef;
+    padding-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Zona de subida de archivos */
+.upload-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    margin: 20px 0;
+    cursor: pointer;
+}
+
+.upload-zone:hover {
+    border-color: #2a5298;
+    background: #f0f4ff;
+}
+
+.upload-zone.dragover {
+    border-color: #2a5298 !important;
+    background: #f0f4ff !important;
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.upload-text {
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.upload-text strong {
+    color: #2a5298;
+}
+
+.upload-hint {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.upload-formats {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Visor CAD 3D */
+.cad-viewer-container {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #f8f9fa;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.cad-viewer-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.viewer-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6c757d;
+    text-align: center;
+    padding: 40px;
+}
+
+.viewer-placeholder-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #dee2e6;
+}
+
+.viewer-placeholder-text {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.viewer-placeholder-hint {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Loading states */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2a5298;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #2a5298;
+    font-weight: 500;
+}
+
+/* Progress bar */
+.progress-container {
+    width: 200px;
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #2a5298;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* Estados sin archivo */
+.no-file-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.no-file-icon {
+    font-size: 3rem;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.no-file-text {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.no-file-hint {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+/* Controles del visor */
+.viewer-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 100;
+}
+
+.viewer-control-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: #2a5298;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.viewer-control-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Información del modelo en el visor */
+.model-info {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    z-index: 100;
+}
+
+.model-info-item {
+    margin-bottom: 5px;
+}
+
+.model-info-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .cad-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .cad-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .archivo-info {
+        grid-template-columns: 1fr;
+    }
+
+    .archivo-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-cad {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cad-viewer-container {
+        height: 400px;
+    }
+
+    .upload-zone {
+        padding: 30px 15px;
+    }
+
+    .upload-icon {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cad-section {
+        padding: 15px;
+    }
+
+    .cad-viewer-container {
+        height: 300px;
+    }
+
+    .upload-zone {
+        padding: 20px 10px;
+    }
+
+    .upload-icon {
+        font-size: 2rem;
+    }
+
+    .viewer-placeholder {
+        padding: 20px;
+    }
+
+    .viewer-placeholder-icon {
+        font-size: 3rem;
+    }
+}
+
+/* Animaciones suaves */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Error states */
+.error-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #dc3545;
+}
+
+.error-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.error-text {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.error-hint {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Success states */
+.success-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #28a745;
+}
+
+.success-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.success-text {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+/* Tooltips para botones */
+.btn-cad[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.btn-cad {
+    position: relative;
+}
