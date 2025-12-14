@@ -1,5 +1,5 @@
 # Usar una imagen de PHP 8.2 con soporte para Apache
-FROM php:8.2-apache
+FROM php:8.2-apache-bookworm
 
 # Instalar dependencias necesarias para Laravel y Node.js
 RUN apt-get update && apt-get install -y \
