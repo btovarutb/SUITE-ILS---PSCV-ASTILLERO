@@ -25,7 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 COPY wait_for_mysql.sh /wait_for_mysql.sh
-RUN chmod +x /wait_for_mysql.sh
+RUN sed -i 's/\r$//' /wait_for_mysql.sh && chmod +x /wait_for_mysql.sh
 
 # Configura la variable de entorno para Flask
 ENV FLASK_APP=app.py
